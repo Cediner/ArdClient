@@ -1,4 +1,4 @@
-package haven.res.gfx.kritter.ratking;
+package haven.res.gfx.kritter.rat.ratking;
 
 import haven.Composite;
 import haven.Composited;
