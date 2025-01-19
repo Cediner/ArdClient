@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Ratking extends Drawable {
-    public final Indir<Resource> tail = Resource.classres(Ratking.class).pool.load("gfx/kritter/rat/ratacle", 2);
+    public final Indir<Resource> tail = Resource.remote().load("gfx/kritter/rat/ratacle", 2);
     public final Random rnd = new Random();
     public final Sprite knot, crown;
     public final GLState croff;
@@ -37,12 +37,12 @@ public class Ratking extends Drawable {
 
     public Ratking(Gob gob) {
         super(gob);
-        knot = Sprite.create(gob, Resource.classres(Ratking.class).pool.load("gfx/kritter/rat/tailknot", 2).get(), Message.nil);
-        crown = Sprite.create(gob, Resource.classres(Ratking.class).pool.load("gfx/terobjs/items/ratcrown", 1).get(), Message.nil);
+        knot = Sprite.create(gob, Resource.remote().loadwait("gfx/kritter/rat/tailknot", 2), Message.nil);
+        crown = Sprite.create(gob, Resource.remote().loadwait("gfx/terobjs/items/ratcrown", 1), Message.nil);
         croff = crown.res.flayer(Skeleton.BoneOffset.class, "rk").from(gob);
     }
 
-    public Resource getres() {return (Resource.classres(Ratking.class));}
+    public Resource getres() {return (Resource.remote().loadwait("gfx/kritter/rat/ratking"));}
 
     private void assignmva(double a) {
         int n = 0;

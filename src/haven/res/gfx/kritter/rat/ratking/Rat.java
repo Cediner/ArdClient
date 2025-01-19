@@ -23,11 +23,11 @@ import java.util.Collections;
 
 public class Rat implements Rendered {
     public static final double ao = Math.PI / 10;
-    public static final Indir<Resource> p_idle = Resource.classres(Rat.class).pool.load("gfx/kritter/rat/idle", 1);
-    public static final Indir<Resource> p_fidle = Resource.classres(Rat.class).pool.load("gfx/kritter/rat/fgtidle-ratking", 1);
-    public static final Indir<Resource> p_walking = Resource.classres(Rat.class).pool.load("gfx/kritter/rat/walking", 3);
-    public static final Indir<Resource> p_resist = Resource.classres(Rat.class).pool.load("gfx/kritter/rat/clawrooted", 1);
-    public static final Indir<Resource> p_knock = Resource.classres(Rat.class).pool.load("gfx/kritter/rat/knock", 1);
+    public static final Indir<Resource> p_idle = Resource.remote().load("gfx/kritter/rat/idle", 1);
+    public static final Indir<Resource> p_fidle = Resource.remote().load("gfx/kritter/rat/fgtidle-ratking", 1);
+    public static final Indir<Resource> p_walking = Resource.remote().load("gfx/kritter/rat/walking", 3);
+    public static final Indir<Resource> p_resist = Resource.remote().load("gfx/kritter/rat/clawrooted", 1);
+    public static final Indir<Resource> p_knock = Resource.remote().load("gfx/kritter/rat/knock", 1);
     public final Ratking king;
     public final Indir<Resource> base;
     public final Composited comp;
