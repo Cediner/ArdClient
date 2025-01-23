@@ -472,7 +472,7 @@ public class Material extends GLState {
                     if (cons != null)
                         ret.left.add(cons.cons(res, args));
                     else {
-                        dev.simpleLog(new Resource.LoadWarning(res, "unknown material part name in %s: %s", res.name, nm));
+                        dev.simpleLog(res.toString(), new Resource.LoadWarning(res, "unknown material part name in %s: %s", res.name, nm));
                         //new Resource.LoadWarning(res, "unknown material part name in %s: %s", res.name, nm).issue();
                     }
                 }

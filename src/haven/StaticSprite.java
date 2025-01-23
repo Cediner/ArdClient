@@ -71,7 +71,7 @@ public class StaticSprite extends Sprite {
             } catch (Loading e) {
                 throw e;
             } catch (Throwable e) {
-                dev.simpleLog(e);
+                dev.simpleLog(res.toString(), e);
             }
         }
         for (RenderLink.Res lr : res.layers(RenderLink.Res.class)) {
@@ -81,7 +81,7 @@ public class StaticSprite extends Sprite {
             } catch (Loading e) {
                 throw e;
             } catch (Throwable e) {
-                dev.simpleLog(e);
+                dev.simpleLog(res.toString(), e);
             }
         }
         if (res.layer(Resource.audio, "amb") != null)

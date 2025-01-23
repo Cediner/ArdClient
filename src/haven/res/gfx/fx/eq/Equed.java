@@ -15,7 +15,9 @@ import haven.Resource;
 import haven.Skeleton;
 import haven.Sprite;
 
-@FromResource(name = "gfx/fx/eq", version = 18, override = true)
+import java.util.function.Function;
+
+@FromResource(name = "gfx/fx/eq", version = 19, override = true)
 public class Equed extends Sprite {
     private final Sprite espr;
     private final GLState eqd;
@@ -51,34 +53,34 @@ public class Equed extends Sprite {
         return (new Equed(owner, res, Sprite.create(owner, eres.get(), sub), bo));
     }
 
-    public static Equed mkrlink(Owner owner, Resource res, Object... args) {
+    public static RenderLink mkrlink(Resource res, Object... args) {
         String epn = (String) args[0];
         String fl = (String) args[1];
         Resource eres = res.pool.load((String) args[2], (Integer) args[3]).get();
-        Resource epres;
+        Function<Owner, Skeleton.BoneOffset> ep;
         if (fl.indexOf('l') >= 0)
-            epres = eres;
+            ep = owner -> eres.flayer(Skeleton.BoneOffset.class, epn);
         else if (fl.indexOf("c") >= 0)
-            epres = ctxres(owner);
+            ep = owner -> ctxres(owner).flayer(Skeleton.BoneOffset.class, epn);
         else if (fl.indexOf("o") >= 0)
-            epres = res;
+            ep = owner -> res.flayer(Skeleton.BoneOffset.class, epn);
         else
-            epres = res;
-        Sprite espr;
+            ep = owner -> res.flayer(Skeleton.BoneOffset.class, epn);
+        Mill<?> mill;
         if ((args.length > 4) && (args[4] instanceof byte[])) {
-            espr = Sprite.create(owner, eres, new MessageBuf((byte[]) args[4]));
+            mill = owner -> Sprite.create(owner, eres, new MessageBuf((byte[]) args[4]));
         } else if ((args.length > 4) && (args[4] instanceof Object[])) {
-            Rendered n = eres.getcode(RenderLink.ArgLink.class, true).create(owner, res, (Object[]) args[4]);
-            if (!(n instanceof Sprite))
-                throw (new Sprite.ResourceException("Sublink returned non-sprite node " + String.valueOf(n), eres));
-            espr = (Sprite) n;
+            RenderLink rl = eres.getcode(RenderLink.ArgLink.class, true).parse( res, (Object[]) args[4]);
+            mill = owner -> {
+                Rendered n = rl.make(owner);
+                if (!(n instanceof Sprite))
+                    throw (new ResourceException("Sublink returned non-sprite node " + String.valueOf(n), eres));
+                return ((Sprite) n);
+            };
         } else {
-            espr = Sprite.create(owner, eres, Message.nil);
+            mill = owner -> Sprite.create(owner, eres, Message.nil);
         }
-        Skeleton.BoneOffset bo = epres.layer(Skeleton.BoneOffset.class, epn);
-        if (bo == null)
-            throw (new RuntimeException("No such bone-offset in " + epres.name + ": " + epn));
-        return (new Equed(owner, res, espr, bo));
+        return (owner -> new Equed(owner, res, mill.create(owner), ep.apply(owner)));
     }
 
     public boolean setup(RenderList r) {
