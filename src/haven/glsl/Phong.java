@@ -90,10 +90,12 @@ public class Phong extends ValBlock.Group {
 
         public void modify(ProgramContext prog) {
             Phong ph = prog.getmod(Phong.class);
-            if (dif)
-                ph.bcol.mod(in -> celramp.call(in), 0);
-            if (spc)
-                ph.scol.mod(in -> celramp.call(in), 0);
+            if (ph != null) {
+                if (dif)
+                    ph.bcol.mod(in -> celramp.call(in), 0);
+                if (spc)
+                    ph.scol.mod(in -> celramp.call(in), 0);
+            }
         }
     }
 
