@@ -1923,7 +1923,7 @@ public class Resource implements Serializable {
         CodeEntry e = layer(CodeEntry.class);
         if (e == null) {
             if (fail)
-                throw (new RuntimeException("Tried to fetch non-present res-loaded class " + cl.getName() + " from " + Resource.this.name));
+                throw (new RuntimeException("Tried to fetch non-present res-loaded class " + cl.getName() + " from " + Resource.this));
 //            else
 //                dev.simpleLog(new RuntimeException("Tried to fetch non-present res-loaded class " + cl.getName() + " from " + Resource.this.name));
             return (null);
@@ -2346,7 +2346,7 @@ public class Resource implements Serializable {
         return (o.name.equals(this.name) && (o.ver == this.ver));
     }
 
-    private static final List<String> depresList = Arrays.asList("gfx/hud/rosters/.*", "gfx/terobjs/cupboard", "gfx/terobjs/crate", "ui/inspect", "ui/croster", "lib/icave", "gfx/terobjs/", "gfx/terobjs/consobj.*", "ui/obj/buddy.*", "gfx/terobjs/peacebreaker.*", "lib/vmat", "gfx/terobjs/arch/upstairs", "lib/svaj", "gfx/terobjs/items/huntersquiver", "gfx/terobjs/items/huntersquiver-pounch", "gfx/terobjs/items/huntersbow", "gfx/terobjs/items/creel", "gfx/terobjs/items/leatherpurse", "gfx/terobjs/items/silkpurse", "gfx/terobjs/items/glassjug");
+    private static final List<String> depresList = Arrays.asList("gfx/hud/rosters/.*", "gfx/terobjs/cupboard", "gfx/terobjs/crate", "ui/inspect", "ui/croster", "lib/icave", "gfx/terobjs/", "gfx/terobjs/consobj.*", "ui/obj/buddy.*", "gfx/terobjs/peacebreaker.*", "lib/vmat", "gfx/terobjs/arch/upstairs", "lib/svaj", "gfx/terobjs/items/huntersquiver", "gfx/terobjs/items/huntersquiver-pounch", "gfx/terobjs/items/huntersbow", "gfx/terobjs/items/creel", "gfx/terobjs/items/leatherpurse", "gfx/terobjs/items/silkpurse", "gfx/terobjs/items/glassjug", "gfx/fx/eq");
 
     private Object[] load(InputStream st) throws IOException {
         LoadException exception = null;

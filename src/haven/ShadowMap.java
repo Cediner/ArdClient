@@ -68,6 +68,15 @@ import static haven.glsl.Type.VEC4;
 
 public class ShadowMap extends GLState implements GLState.GlobalState, GLState.Global {
     public final static Slot<ShadowMap> smap = new Slot<ShadowMap>(Slot.Type.DRAW, ShadowMap.class, Light.lighting);
+    public final static GLState.StandAlone maskshadow = new GLState.StandAlone(Slot.Type.GEOM) {
+        @Override
+        public void apply(final GOut g) {}
+
+        @Override
+        public void unapply(final GOut g) {}
+
+        public ShaderMacro shader() {return (null);}
+    };
     public DirLight light;
     public final TexE lbuf;
     private final Projection lproj;
@@ -80,6 +89,13 @@ public class ShadowMap extends GLState implements GLState.GlobalState, GLState.G
     private final List<RenderList.Slot> parts = new ArrayList<RenderList.Slot>();
     private int slidx;
     private Matrix4f txf;
+
+    @Material.ResName("maskshadow")
+    public static class $maskshadow implements Material.ResCons {
+        public GLState cons(Resource res, Object... args) {
+            return (maskshadow);
+        }
+    }
 
     public ShadowMap(Coord res, float size, float depth, float dthr) {
         lbuf = new TexE(res, GL2.GL_DEPTH_COMPONENT, GL2.GL_DEPTH_COMPONENT, GL.GL_UNSIGNED_INT);
