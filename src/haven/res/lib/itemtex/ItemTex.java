@@ -44,6 +44,16 @@ public class ItemTex {
         public Random mkrandoom() {return (new Random());}
     }
 
+    public static Resource res(OwnerContext owner, Message osdt) {
+        MessageBuf sdt = new MessageBuf(osdt.bytes()).clone();
+        int resid = sdt.uint16();
+        if ((resid & 0x8000) != 0) {
+            resid &= ~0x8000;
+        }
+        Resource ires = owner.context(Resource.Resolver.class).getres(resid).get();
+        return (ires);
+    }
+
     public static GSprite mkspr(OwnerContext owner, Message sdt) {
         int resid = sdt.uint16();
         Message isdt = Message.nil;
