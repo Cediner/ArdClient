@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class SkelSprite extends Sprite implements Gob.Overlay.CUpd, Skeleton.HasPose {
+public class SkelSprite extends Sprite implements Gob.Overlay.CUpd, Skeleton.HasPose, Sprite.CUpd {
     public static final GLState
             rigid = new Material.Colors(java.awt.Color.GREEN),
             morphed = new Material.Colors(java.awt.Color.RED),
