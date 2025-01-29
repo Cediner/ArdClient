@@ -73,6 +73,7 @@ public class ItemTex {
     }
 
     public static final Map<MessageBuf, BufferedImage> made = new CacheMap<>();
+    public static final Map<MessageBuf, GSprite> madeg = new CacheMap<>();
 
     public static BufferedImage create(OwnerContext owner, Message osdt) {
         MessageBuf copy = new MessageBuf(osdt.bytes());
@@ -80,6 +81,16 @@ public class ItemTex {
             BufferedImage ret = made.get(copy);
             if (ret == null)
                 made.put(copy, ret = sprimg(mkspr(owner, copy.clone())));
+            return (ret);
+        }
+    }
+
+    public static GSprite createg(OwnerContext owner, Message osdt) {
+        MessageBuf copy = new MessageBuf(osdt.bytes());
+        synchronized (madeg) {
+            GSprite ret = madeg.get(copy);
+            if (ret == null)
+                madeg.put(copy, ret = mkspr(owner, copy.clone()));
             return (ret);
         }
     }

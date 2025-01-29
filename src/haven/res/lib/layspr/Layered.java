@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Layered extends GSprite implements GSprite.ImageSprite {
     final Layer[] lay;
     final Coord sz;
+    public final List<Resource> layers = new CopyOnWriteArrayList<>();
 
     public static List<Indir<Resource>> decode(Resource.Resolver rr, Message sdt) {
         List<Indir<Resource>> ret = new ArrayList<>();
@@ -29,6 +31,7 @@ public class Layered extends GSprite implements GSprite.ImageSprite {
         super(owner);
         List<Layer> lay = new ArrayList<>(lres.size());
         for (Indir<Resource> res : lres) {
+            layers.add(res.get());
             boolean f = false;
             for (Resource.Anim anim : res.get().layers(Resource.animc)) {
                 f = true;

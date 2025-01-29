@@ -4,6 +4,7 @@ import haven.Config;
 import haven.Coord3f;
 import haven.FastMesh;
 import haven.GLState;
+import haven.GSprite;
 import haven.Gob;
 import haven.Location;
 import haven.MCache;
@@ -62,10 +63,13 @@ public class Decal implements Sprite.Factory {
             offset = Location.xlate(pc);
         Material sym = null;
         final AtomicReference<Resource> iconResource = new AtomicReference<>();
+        final AtomicReference<GSprite> iconSprite = new AtomicReference<>();
         if (!sdt.eom()) {
             MessageBuf copy = new MessageBuf(sdt).clone();
             iconResource.set(ItemTex.res(owner, copy));
-            BufferedImage img = ItemTex.create(owner, sdt);
+            GSprite sprite = ItemTex.createg(owner, sdt);
+            iconSprite.set(sprite);
+            BufferedImage img = ItemTex.sprimg(sprite);
             if (img != null) {
                 TexL tex = ItemTex.fixup(img);
                 sym = new Material(base, tex.draw, tex.clip);
@@ -76,19 +80,21 @@ public class Decal implements Sprite.Factory {
             parts = Utils.extend(parts, sym.apply(proj));
         Location cpoffset = offset;
         GLState cpeq = eq;
-        return (new DecalSprite(owner, res, parts, iconResource.get(), cpoffset, cpeq));
+        return (new DecalSprite(owner, res, parts, iconResource.get(), iconSprite.get(), cpoffset, cpeq));
     }
 
     public static class DecalSprite extends StaticSprite {
         public final Resource iconResource;
+        public final GSprite sprite;
         public final Location cpoffset;
         public final GLState cpeq;
         GLState normal;
         GLState xray;
 
-        public DecalSprite(final Owner owner, final Resource res, final Rendered[] parts, final Resource icon, final Location cpoffset, final GLState cpeq) {
+        public DecalSprite(final Owner owner, final Resource res, final Rendered[] parts, final Resource icon, final GSprite sprite, final Location cpoffset, final GLState cpeq) {
             super(owner, res, parts);
             this.iconResource = icon;
+            this.sprite = sprite;
             this.cpoffset = cpoffset;
             this.cpeq = cpeq;
             normal = cpeq != null ? cpeq : cpoffset;
