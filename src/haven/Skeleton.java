@@ -26,6 +26,8 @@
 
 package haven;
 
+import modification.dev;
+
 import javax.media.opengl.GL2;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -605,7 +607,12 @@ public class Skeleton {
     }
 
     public PoseMod mkposemod(ModOwner owner, Resource res, Message sdt) {
-        ModFactory f = res.getcode(ModFactory.class, false);
+        ModFactory f = null;
+        try {
+            f = res.getcode(ModFactory.class, false);
+        } catch (final Throwable e) {
+            dev.simpleLog(e);
+        }
         if (f == null)
             f = ModFactory.def;
         return (f.create(this, owner, res, sdt));
@@ -1164,7 +1171,7 @@ public class Skeleton {
         private Track[] iaIaCthulhuFhtagn(Skeleton skel) {
             Track[] remap = new Track[skel.blist.length];
             for (Track t : tracks) {
-                Skeleton.Bone b = skel.bones.get(t.bone);
+                Bone b = skel.bones.get(t.bone);
                 if (b == null)
                     throw (new RuntimeException("Bone \"" + t.bone + "\" in animation reference does not exist in skeleton " + skel));
                 remap[b.idx] = t;

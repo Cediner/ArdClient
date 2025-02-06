@@ -31,12 +31,12 @@ import haven.Composited.MD;
 import haven.Skeleton.Pose;
 import haven.Skeleton.PoseMod;
 import haven.sloth.gob.Type;
+import modification.dev;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class Composite extends Drawable implements EquipTarget {
     public static final float ipollen = 0.2f;
@@ -117,10 +117,14 @@ public class Composite extends Drawable implements EquipTarget {
     public List<PoseMod> loadposes(Collection<ResData> rl, Skeleton skel, boolean old) {
         List<PoseMod> mods = new ArrayList<>(rl.size());
         for (ResData dat : rl) {
-            PoseMod mod = skel.mkposemod(gob, dat.res.get(), dat.sdt.clone());
-            if (old)
-                mod.age();
-            mods.add(mod);
+            try {
+                PoseMod mod = skel.mkposemod(gob, dat.res.get(), dat.sdt.clone());
+                if (old)
+                    mod.age();
+                mods.add(mod);
+            } catch (Throwable e) {
+                dev.simpleLog("Composite: " + dat.res.get(), e);
+            }
         }
         return (mods);
     }
@@ -195,9 +199,9 @@ public class Composite extends Drawable implements EquipTarget {
     @Override
     public GLState eqpoint(String nm, Message dat) {
         Skeleton.BoneOffset bo = getres().layer(Skeleton.BoneOffset.class, nm);
-        if(bo != null)
-            return(bo.from(comp));
-        return(comp.eqpoint(nm, dat));
+        if (bo != null)
+            return (bo.from(comp));
+        return (comp.eqpoint(nm, dat));
     }
 
     @Override
