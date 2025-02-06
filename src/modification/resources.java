@@ -1,6 +1,5 @@
 package modification;
 
-import haven.HSliderListbox;
 import haven.HSliderListboxItem;
 import haven.Indir;
 import haven.Light;
@@ -33,13 +32,15 @@ public class resources {
     public static String picturePath = "modification/picture";
 
     public static boolean defaultUtilsCustomLoginScreenBgBoolean = Utils.getprefb("custom-login-background-bol", false);
-    public static String defaultCustomLoginScreenBg = picturePath + "/loginscr.png";
+    public static String defaultCustomLoginScreenBg = picturePath + "/loginscr_death.png";
     public static String defaultUtilsCustomLoginScreenBg = Utils.getpref("custom-login-background", defaultCustomLoginScreenBg);
 
     public static Tex bgCheck() {
         Tex bg = null;
         if (defaultUtilsCustomLoginScreenBgBoolean)
             bg = configuration.imageToTex(defaultUtilsCustomLoginScreenBg, true);
+        if (bg == null)
+            bg = configuration.imageToTex(defaultCustomLoginScreenBg, true);
         if (bg == null)
             bg = Resource.local().loadwait("gfx/loginscr").layer(Resource.imgc).tex(UI.getScale());
         return bg;

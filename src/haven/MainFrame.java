@@ -45,11 +45,15 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 
 public class MainFrame extends java.awt.Frame implements Runnable, Console.Directory {
@@ -59,7 +63,15 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
     private final ThreadGroup g;
     public final Thread mt;
     DisplayMode fsmode = null, prefs = null;
-    public static final String TITLE = "ARD Unstable ???: Graveyard of Broken Clients";
+
+    public static String TITLE() {
+        //System.out.println(encrypt(String.join("\n", death), "death"));
+        List<String> death = Arrays.stream(decrypt(MainFrame.deathMessages, "death").split("\n")).collect(Collectors.toList());
+        String pre = "ARD Deathlike I: ";
+        String post = death.get((int) (Math.random() * death.size()));
+        String ret = pre + post;
+        return (ret);
+    }
 
     public static void initawt() {
         try {
@@ -363,14 +375,14 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
                         if (configuration.customTitleBoolean)
                             setTitle(configuration.tittleCheck(sess));
                         else
-                            setTitle(TITLE);
+                            setTitle(TITLE());
                     } else {
                         fun = new RemoteUI(sess);
                         lui.setSession(sess);
                         if (configuration.customTitleBoolean)
                             setTitle(configuration.tittleCheck(sess));
                         else
-                            setTitle(/*sess.username + " \u2013 " + */TITLE);
+                            setTitle(/*sess.username + " \u2013 " + */TITLE());
                     }
                     sess = fun.run(lui);
 //                    lui.root.reqdestroy();
@@ -398,8 +410,8 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
         ResCache cache = ResCache.getCache("resources");
         if (cache != null)
             Resource.setcache(cache);
-        if (Config.resurl != null)
-            Resource.addurl(Config.resurl, cache);
+        //if (Config.resurl != null)
+        //    Resource.addurl(Config.resurl, cache);
         ResCache ncache = ResCache.getCache("resources_new");
         if (ncache != null)
             Resource.setcache(ncache);
@@ -518,5 +530,32 @@ public class MainFrame extends java.awt.Frame implements Runnable, Console.Direc
         } catch (IOException e) {
             throw (new RuntimeException(e));
         }
+    }
+
+
+    //encrypted list for experience
+    private static final String deathMessages = "MA0EVA8LBA1UBwJFABgERAkIEg1EDBJUDAEEFRxiKRASAEgKChVUCQgJQQAADQsGB0gFEUEAAAFFDRUbEEUDEUgXEgAYBAsSBBBIERVBHQZEAQQVHAxaayMNRAgIEwAQRQAHSBMADRhIAAwEVAkXRRUbSAMKQRsGRAkIAgEKAkEYAQ8AQQAADRZrOQ0JAA8AB0QIDgYBbikIAg0ARRYdHAwKFABIAgAABkREBA8QSAAMBBBIEwwVHAcREUESDQUXazkRRAQPFw0XEQ4GG0QEExFIFwgIGAEKAkEVHEQIBFpIJwQPVBELEEEHCR1FFRwNRBYAGQ1bbyYVBQFFJREeAQkOBAUBCxVOSCgMEgANAEU2Gx0KAWswDQURCVQBF0UPGxxEEQkRSAsVERsbDREEVAcCRQ0dDgFJQRYdEEUAVBgFFxVUBwJFCABiMApBAAABRRYRBAhIDgYPBQsIDg0ARQwdBgBJQRANBREJVAEXRQMBHEQRCRFICgAZAEgDFwQVHEQEBQINChEUBg1uMgRUCQgJQRABAUtBIAABRQYbCQhFCAcGhuX4AEgQCkEYARIAQRIHFgAXERpIRRUcDUQCDhUERAwSVBwLRQIGDQURBFQbCwgEAAANCwZUHAwEFVQfDQkNfiYLRQ4aDUQMElQJBxEUFQQIHEEQDQUBQQEGEAwNVBwMAEEGARQVDREbRBEJERFEBgABGwFFCBpIEA0EVB8LFw0QSAAMBFQJEwQYfiwBBBUcSA0WQRVICgQVARoFCUEECRYRQRsORAkIEg1KRTMRAgsMAhFIAgoTVBwMChIRSAUXDgEGAEUYGx1EEgkbSBAXABobAgoTGUgNCxUbSBANBFQuCxcCEWIwDQRUCgsQDxAJFgwEB0gTDQgXAEQBCAIBAABBOAECAEESGgsIQTANBREJVAkWAEEVHEQHBAccRBYJFQwLEhhUCQoBQQIJAxAE";
+
+    //for encrypt your text
+    /*public static String encrypt(String text, String key) {
+        byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        byte[] result = new byte[textBytes.length];
+
+        for (int i = 0; i < textBytes.length; i++) {
+            result[i] = (byte) (textBytes[i] ^ keyBytes[i % keyBytes.length]);
+        }
+        return (Base64.getEncoder().encodeToString(result));
+    }*/
+
+    public static String decrypt(String encryptedText, String key) {
+        byte[] encryptedBytes = Base64.getDecoder().decode(encryptedText);
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        byte[] result = new byte[encryptedBytes.length];
+
+        for (int i = 0; i < encryptedBytes.length; i++) {
+            result[i] = (byte) (encryptedBytes[i] ^ keyBytes[i % keyBytes.length]);
+        }
+        return (new String(result, StandardCharsets.UTF_8));
     }
 }

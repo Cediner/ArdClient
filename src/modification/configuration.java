@@ -41,7 +41,6 @@ import haven.purus.pbot.PBotUtils;
 import haven.sloth.gfx.SnowFall;
 import haven.sloth.gob.Hidden;
 import haven.sloth.util.ObservableCollection;
-import haven.sloth.util.ObservableMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -101,7 +100,7 @@ public class configuration {
         return "♂" + name + "♂: ♂right version♂";
     }
 
-    public static String defaultTitle = MainFrame.TITLE;
+    //public static String defaultTitle = MainFrame.TITLE();
     public static String defaultCustomTitle = "https://youtu.be/dQw4w9WgXcQ";
     public static String defaultUtilsCustomTitle = Utils.getpref("custom-title", defaultCustomTitle);
 
@@ -116,7 +115,7 @@ public class configuration {
         if (configuration.customTitleBoolean)
             title = configuration.defaultUtilsCustomTitle;
         else
-            title = defaultTitle;
+            title = MainFrame.TITLE();
 
         return name + title;
     }
@@ -1770,6 +1769,7 @@ public class configuration {
 
     public static boolean showcolortiles = Utils.getprefb("showcolortiles", false);
     public static final JsonElement customTiles = Utils.loadCustomElement("CustomColorTiles");
+
     public static Integer getTileColor(String tileResName) {
         synchronized (customTiles) {
             JsonObject obj = customTiles.getAsJsonObject();

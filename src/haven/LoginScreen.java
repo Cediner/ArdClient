@@ -83,7 +83,7 @@ public class LoginScreen extends Widget {
         background = add(new Img(bg), Coord.z);
         optbtn = adda(new Button(UI.scale(100), "Options"), sz.x - UI.scale(10), UI.scale(40), 1, 1);
 //        new UpdateChecker().start();
-        loginList = adda(new LoginList(UI.scale(200), 29), UI.scale(10, 10), 0, 0);
+        loginList = adda(new LoginList(UI.scale(200), 29), UI.scale(10, sz.y / 2), 0, 0.5);
 //        statusbtn = adda(new Button(200, "Initializing..."), sz.x - 210, 80, 0, 1);
 //        StartUpdaterThread();
         status = adda(new StatusLabel(Config.Variable.prop("haven.defhost", "www.havenandhearth.com").get(), 0.5), Coord.of(sz.x - UI.scale(10), UI.scale(80)), 1, 1);
@@ -93,12 +93,17 @@ public class LoginScreen extends Widget {
 
     private void showChangeLog() {
         changeLogShowed = true;
-        log = ui.root.add(new Window(UI.scale(50, 50), "Changelog"), UI.scale(100, 50));
+        log = new Window(UI.scale(50, 50), "Information");
         log.justclose = true;
         Textlog txt = log.add(new Textlog(UI.scale(450, 200)));
         txt.quote = false;
         int maxlines = txt.maxLines = 200;
         log.pack();
+        txt.append("Client is now very unstable!");
+        txt.append("Dropped, as announced for a few years or whatever now, support for the old pre-render-rework game resources. Yay!");
+        txt.append("Use another client!");
+        txt.append("More about 'Haven and Hearth' can be found here: https://discord.gg/24Tq35uwBD");
+        txt.append("\n");
         try {
             String git = "";
             {
@@ -132,12 +137,14 @@ public class LoginScreen extends Widget {
         }
         txt.setprog(0);
 
-        log.add(new Button(log.sz.x, "REPAIR PREFERENCES").action(() -> {
-            try {
-                ui.cons.run("sqliteexport");
-            } catch (Exception e) {}
-        }), log.pos("cbl")).settip("After exporting client will turn off");
+        //log.add(new Button(log.sz.x, "REPAIR PREFERENCES").action(() -> {
+        //    try {
+        //        ui.cons.run("sqliteexport");
+        //    } catch (Exception e) {}
+        //}), log.pos("cbl")).settip("After exporting client will turn off");
         log.pack();
+
+        ui.root.adda(log, ui.root.pos("cmid").div(1, 2), 0.5, 0.5);
     }
 
     private static abstract class Login extends Widget {
@@ -394,6 +401,7 @@ public class LoginScreen extends Widget {
     }
 
     private static boolean steam_autologin = false;
+
     public class Steambox extends Widget {
 
         private Steambox() {
@@ -401,27 +409,29 @@ public class LoginScreen extends Widget {
             Widget prev = adda(new Label("Logging in with Steam", textf), sz.x / 2, 0, 0.5, 0);
             adda(new IButton("gfx/hud/buttons/login", "u", "d", "o") {
                      protected void depress() {ui.sfx(Button.lbtdown.stream());}
+
                      protected void unpress() {ui.sfx(Button.lbtup.stream());}
+
                      public void click() {enter();}
                  },
                     prev.pos("bl").adds(0, 10).x(sz.x / 2), 0.5, 0.0);
         }
 
         private AuthClient.Credentials creds() throws java.io.IOException {
-            return(new SteamCreds());
+            return (new SteamCreds());
         }
 
         private void enter() {
             try {
                 LoginScreen.this.wdgmsg("login", creds(), false);
-            } catch(java.io.IOException e) {
+            } catch (java.io.IOException e) {
                 error(e.getMessage());
             }
         }
 
         public void tick(double dt) {
             super.tick(dt);
-            if(steam_autologin) {
+            if (steam_autologin) {
                 enter();
                 steam_autologin = false;
             }
@@ -439,7 +449,7 @@ public class LoginScreen extends Widget {
                     Audio.play(Button.lbtup.stream());
                 }
             }, LoginScreen.this.sz.x / 2, LoginScreen.this.sz.y / 2 + UI.scale(100), 0.5, 0);
-            adda(steambox = new Steambox(), LoginScreen.this.sz.x, LoginScreen.this.sz.y, 1, 1);
+            adda(steambox = new Steambox(), UI.scale(10), LoginScreen.this.sz.y, 0, 1);
             progress(null);
         }
     }
@@ -548,7 +558,7 @@ public class LoginScreen extends Widget {
         lower();
         presize();
         parent.setfocus(this);
-        if (Config.isUpdate && !changeLogShowed) {
+        if (true && !changeLogShowed) {
             showChangeLog();
         }
     }
@@ -574,7 +584,7 @@ public class LoginScreen extends Widget {
         int zeroy = MainFrame.instance.p.getSize().height > sz.y ? 0 : sz.y / 2 - MainFrame.instance.p.getSize().height / 2;
 
         optbtn.move(new Coord(zerox + szx - UI.scale(10), zeroy + UI.scale(40)), 1, 1);
-        loginList.move(new Coord(zerox + UI.scale(10), zeroy + UI.scale(10)), 0, 0);
+        loginList.move(new Coord(zerox + UI.scale(10), zeroy + szy / 2), 0, 0.5);
 //        statusbtn.move(new Coord(zerox + szx - 210, zeroy + 80), 0, 1);
         status.move(new Coord(zerox + szx - UI.scale(10), zeroy + UI.scale(80)), 1, 1);
         if (cur != null)
