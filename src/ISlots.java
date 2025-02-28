@@ -87,27 +87,33 @@ public class ISlots extends Tip implements NumberInfo {
 
             for (ItemInfo ii : si.info) {
                 if (ii instanceof AttrMod) {
-                    for (AttrMod.Mod mod : ((AttrMod) ii).mods) {
+                    for (haven.res.ui.tt.attrmod.Entry mod : ((AttrMod) ii).tab) {
                         boolean exist = false;
-                        for (Map.Entry<Resource, Integer> entry : totalAttr.entrySet()) {
-                            if (entry.getKey().equals(mod.attr)) {
-                                exist = true;
-                                entry.setValue(entry.getValue() + mod.mod);
-                                break;
+                        if (mod instanceof haven.res.ui.tt.attrmod.Mod) {
+                            haven.res.ui.tt.attrmod.Mod m = (haven.res.ui.tt.attrmod.Mod) mod;
+                            for (Map.Entry<Resource, Integer> entry : totalAttr.entrySet()) {
+                                if (entry.getKey().equals(mod.attr)) {
+                                    exist = true;
+                                    entry.setValue((int) (entry.getValue() + m.mod));
+                                    break;
+                                }
+                            }
+                            if (mod.attr instanceof haven.res.ui.tt.attrmod.resattr) {
+                                haven.res.ui.tt.attrmod.resattr r = (haven.res.ui.tt.attrmod.resattr) mod.attr;
+                                if (!exist)
+                                    totalAttr.put(r.res, (int) m.mod);
                             }
                         }
-                        if (!exist)
-                            totalAttr.put(mod.attr, mod.mod);
                     }
                 }
             }
         }
         if (ui == null || ui.modflags() != UI.MOD_SHIFT)
             if (totalAttr.size() > 0) {
-                List<AttrMod.Mod> lmods = new ArrayList<>();
+                List<haven.res.ui.tt.attrmod.Mod> lmods = new ArrayList<>();
                 List<Map.Entry<Resource, Integer>> sortAttr = totalAttr.entrySet().stream().sorted(this::BY_PRIORITY).collect(Collectors.toList());
                 for (Map.Entry<Resource, Integer> entry : sortAttr) {
-                    lmods.add(new AttrMod.Mod(entry.getKey(), entry.getValue()));
+                    lmods.add(new haven.res.ui.tt.attrmod.Mod(new haven.res.ui.tt.attrmod.intattr(entry.getKey()), entry.getValue()));
                 }
                 l.cmp.add(AttrMod.modimg(lmods), new Coord(10, l.cmp.sz.y));
             }
