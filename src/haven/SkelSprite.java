@@ -137,7 +137,7 @@ public class SkelSprite extends Sprite implements Gob.Overlay.CUpd, Skeleton.Has
         for (RenderLink.Res lr : res.layers(RenderLink.Res.class)) {
             try {
                 if ((lr.id < 0) || (((1 << lr.id) & mask) != 0)) {
-                    Rendered r = lr.l.make();
+                    Rendered r = lr.l.make(owner);
                     if (r instanceof GLState.Wrapping)
                         r = animwrap((GLState.Wrapping) r);
                     rl.add(r);
