@@ -4,6 +4,7 @@ import haven.Drawable;
 import haven.EquipTarget;
 import haven.FromResource;
 import haven.GLState;
+import haven.GOut;
 import haven.Gob;
 import haven.Indir;
 import haven.Message;
@@ -14,6 +15,7 @@ import haven.Rendered;
 import haven.Resource;
 import haven.Skeleton;
 import haven.Sprite;
+import modification.dev;
 
 import java.util.function.Function;
 
@@ -70,13 +72,24 @@ public class Equed extends Sprite {
         if ((args.length > 4) && (args[4] instanceof byte[])) {
             mill = owner -> Sprite.create(owner, eres, new MessageBuf((byte[]) args[4]));
         } else if ((args.length > 4) && (args[4] instanceof Object[])) {
-            RenderLink rl = eres.getcode(RenderLink.ArgLink.class, true).parse( res, (Object[]) args[4]);
-            mill = owner -> {
-                Rendered n = rl.make(owner);
-                if (!(n instanceof Sprite))
-                    throw (new ResourceException("Sublink returned non-sprite node " + String.valueOf(n), eres));
-                return ((Sprite) n);
-            };
+            try {
+                RenderLink rl = eres.getcode(RenderLink.ArgLink.class, true).parse( res, (Object[]) args[4]);
+                mill = owner -> {
+                    Rendered n = rl.make(owner);
+                    if (!(n instanceof Sprite))
+                        throw (new ResourceException("Sublink returned non-sprite node " + String.valueOf(n), eres));
+                    return ((Sprite) n);
+                };
+            } catch (Throwable e) {
+                dev.simpleLog("equed " + res, e);
+                return (owner -> new Rendered() {
+                    @Override
+                    public boolean setup(final RenderList r) {return (false);}
+
+                    @Override
+                    public void draw(final GOut g) {}
+                });
+            }
         } else {
             mill = owner -> Sprite.create(owner, eres, Message.nil);
         }
