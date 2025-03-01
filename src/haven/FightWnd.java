@@ -232,7 +232,7 @@ public class FightWnd extends Widget {
         private Pattern ezFix = Pattern.compile("(.*\\$img\\[)([A-Za-z\\/]+)(].*)");
 
         public BufferedImage renderinfo(int width) {
-            ItemInfo.Layout l = new ItemInfo.Layout();
+            ItemInfo.Layout l = new ItemInfo.Layout(this);
             l.width = width;
             List<ItemInfo> info = info();
             l.cmp.add(rendericon(), Coord.z);
