@@ -38,7 +38,9 @@ import modification.Billpole;
 import modification.Fixedplob;
 import modification.dev;
 
-import java.lang.reflect.Constructor;
+import java.awt.Color;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -211,7 +213,7 @@ public abstract class Sprite implements Rendered {
     public abstract boolean setup(RenderList d);
 
     public boolean tick(double dt) {
-        return(false);
+        return (false);
     }
 
     public boolean tick(int dt) {
@@ -226,6 +228,54 @@ public abstract class Sprite implements Rendered {
 
 
     public static class FakeSprite extends Sprite {
+        private static final FastMesh fakeMesh;
+        private static final GLState state = GLState.compose(Material.nofacecull, MapMesh.postmap, States.vertexcolor);
+
+        static {
+            FloatBuffer pa = Utils.mkfbuf(4 * 2 * 3);
+            ShortBuffer sa = Utils.mksbuf(3 * 2 * 6);
+
+            pa.put(1f).put(1f).put(0);
+            pa.put(1f).put(-1f).put(0);
+            pa.put(-1f).put(-1f).put(0);
+            pa.put(-1f).put(1f).put(0);
+            pa.put(1f).put(1f).put(2f);
+            pa.put(1f).put(-1f).put(2f);
+            pa.put(-1f).put(-1f).put(2f);
+            pa.put(-1f).put(1f).put(2f);
+
+            FloatBuffer na = pa;
+
+            FloatBuffer cl = Utils.mkfbuf(4 * 2 * 4);
+            Color c1 = Color.RED;
+            Color c2 = Color.BLACK;
+            for (int i = 0; i < 4 * 2; i++) {
+                Color c = i % 2 == 0 ? c1 : c2;
+                cl.put(c.getRed() / 255f).put(c.getGreen() / 255f).put(c.getBlue() / 255f).put(c.getAlpha() / 255f);
+            }
+
+            sa.put((short) 0).put((short) 1).put((short) 2);
+            sa.put((short) 0).put((short) 3).put((short) 2);
+
+            sa.put((short) 4).put((short) 0).put((short) 1);
+            sa.put((short) 4).put((short) 5).put((short) 1);
+
+            sa.put((short) 5).put((short) 1).put((short) 2);
+            sa.put((short) 5).put((short) 6).put((short) 2);
+
+            sa.put((short) 6).put((short) 2).put((short) 3);
+            sa.put((short) 6).put((short) 7).put((short) 3);
+
+            sa.put((short) 7).put((short) 3).put((short) 0);
+            sa.put((short) 7).put((short) 4).put((short) 0);
+
+            sa.put((short) 4).put((short) 5).put((short) 6);
+            sa.put((short) 4).put((short) 7).put((short) 6);
+
+
+            fakeMesh = new FastMesh(new VertexBuf(new VertexBuf.VertexArray(pa), new VertexBuf.NormalArray(na), new VertexBuf.ColorArray(cl)), sa);
+        }
+
         public final byte[] data;
 
         public FakeSprite(Owner owner, Resource resource, Message sdt) {
@@ -236,7 +286,8 @@ public abstract class Sprite implements Rendered {
 
         @Override
         public boolean setup(RenderList d) {
-            return (false);
+            d.add(fakeMesh, state);
+            return (true);
         }
     }
 
