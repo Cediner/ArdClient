@@ -377,7 +377,7 @@ public class Fightview extends MovableWidget {
                         if (Alerted.customsort.get(aitem)) Audio.play(aitem, vol);
                         else Audio.play(Resource.local().load(aitem), vol);
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                 }//ignore because a crash here would prob get someone killed
             }
         if (lastact != null && Config.logcombatactions) {
@@ -406,7 +406,7 @@ public class Fightview extends MovableWidget {
         int unarmedcombat = 0;
         try {
             chrwdg = ((GameUI) parent.parent).chrwdg;
-        } catch (Exception e) { // fail silently
+        } catch (Throwable e) { // fail silently
         }
         if (chrwdg != null) {
             for (CharWnd.SAttr attr : chrwdg.skill) {
@@ -627,7 +627,7 @@ public class Fightview extends MovableWidget {
                 g.chcolor();
                 y += bg.sz().y + ymarg + UI.scale(16);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
         super.draw(g);

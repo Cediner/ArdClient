@@ -98,7 +98,7 @@ public class Alerted {
         for (final String sound : sounds) {
             try {
                 Resource.local().load(sound);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 //Ignore it
                 logger.atSevere().withCause(e).log("Failed to load %s", sound);
             }
@@ -196,14 +196,14 @@ public class Alerted {
                                 sgobs.add(g.id);
                             }
                             alertedmap.put(g.id, System.currentTimeMillis());
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             e.printStackTrace();
                             System.out.println("[Alerted checkAlert] Sound: " + getConnectSound(name).toString() + " Gob: " + g.getres());
                         }
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }//crashing during an alarm would be bad
     }

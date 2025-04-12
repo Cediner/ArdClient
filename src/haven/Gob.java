@@ -1705,8 +1705,7 @@ public class Gob implements Rendered, Sprite.Owner, Skeleton.ModOwner, Skeleton.
                         }
                         Resource ires = this.context(Resource.Resolver.class).getres(resid).get();//meat???
                         signText = ires.basename();
-                    } catch (Exception e) {
-                    }
+                    } catch (Throwable e) {}
                 }
                 if (signText != null) {
                     if (signtext == null) signtext = new gobText(this, signText, Color.GREEN, 50);
@@ -1998,7 +1997,7 @@ public class Gob implements Rendered, Sprite.Owner, Skeleton.ModOwner, Skeleton.
                         }
                     }
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 //TODO: This is a weird issue that can pop up on startup, need to look into it
                 return false;
             }
@@ -2021,7 +2020,7 @@ public class Gob implements Rendered, Sprite.Owner, Skeleton.ModOwner, Skeleton.
                 Resource res;
                 try {
                     res = getres();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     break plants;
                 }
                 if (res == null) break plants;
@@ -2290,7 +2289,7 @@ public class Gob implements Rendered, Sprite.Owner, Skeleton.ModOwner, Skeleton.
         try { //not clean but when multi-sessioning client can crash here when second client is booting.
             final UI ui = glob.ui.get();
             return ui.gui.map.plgob == id;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return false;
         }
     }

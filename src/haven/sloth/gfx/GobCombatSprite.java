@@ -114,7 +114,7 @@ public class GobCombatSprite extends Sprite {
                             g.aimage(timetex, lc, 0.5, 0.5);
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
             }
@@ -165,7 +165,7 @@ public class GobCombatSprite extends Sprite {
                             lastt = lastuse;
                     }
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }

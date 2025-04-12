@@ -400,7 +400,7 @@ public class configuration {
             double scale2 = (double) chosenSize.y / h;
 
             return scalingImage(before, chosenSize, scale1, scale2);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return before;
         }

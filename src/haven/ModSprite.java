@@ -499,7 +499,7 @@ public class ModSprite extends Sprite implements Sprite.CUpd, EquipTarget {
                         }
                     } catch (Loading e) {
                         throw (e);
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         dev.simpleLog(e);
                     }
                 }

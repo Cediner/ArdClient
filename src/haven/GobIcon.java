@@ -548,7 +548,7 @@ public class GobIcon extends GAttrib {
                                     Resource.Tooltip name = icon.conf.res.loadsaved(Resource.remote()).layer(Resource.tooltip);
                                     icon.name = elf.render((name == null) ? "???" : name.t);
                                 }
-                            } catch (Exception l) {
+                            } catch (Throwable l) {
                                 reorder = true;
                             }
                         }

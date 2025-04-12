@@ -33,7 +33,7 @@ public class GobSpawner extends Window {
                         if (v.equals(item)) {
                             try {
                                 spawnGob(k);
-                            } catch (Exception e) {
+                            } catch (Throwable e) {
                                 PBotUtils.sysMsg(ui, "Exception in gob spawner.", Color.white);
                                 e.printStackTrace();
                             }

@@ -142,7 +142,7 @@ public class CustomFakeGrid extends Sprite {
                 boolean b = super.keydown(e);
                 try {
                     Double.parseDouble(text());
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     settext(backup);
                 }
                 return (b);
@@ -162,7 +162,7 @@ public class CustomFakeGrid extends Sprite {
                 boolean b = super.keydown(e);
                 try {
                     Double.parseDouble(text());
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     settext(backup);
                 }
                 return (b);

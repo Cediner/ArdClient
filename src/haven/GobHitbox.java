@@ -89,7 +89,7 @@ public class GobHitbox extends Sprite {
                 gl.glDrawArrays(mode, 0, b[i].points.length);
                 gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

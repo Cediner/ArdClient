@@ -138,7 +138,7 @@ public class dev {
                 try {
                     Resource res = ((GItem) widget).getres();
                     System.out.print("[" + res + "]");
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     System.out.print(e);
                 }
             }
@@ -179,7 +179,7 @@ public class dev {
                 try {
                     Resource res = ((GItem) widget).getres();
                     System.out.print("[" + res + "]");
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     System.out.print(e);
                 }
             }
@@ -231,7 +231,7 @@ public class dev {
             }
             if (curver != res.ver)
                 System.out.printf("[i] Resource [%s] (old %d). Please update!", res, curver);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

@@ -39,7 +39,7 @@ public class GridMesh extends FastMesh {
                 colors[i][1] = c.getBlue() / 255f;
                 colors[i][2] = c.getGreen() / 255f;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             logger.atSevere().withCause(e).log("Missing data/grad.png file for grid meshes");
             logger.atSevere().log("%s", i);

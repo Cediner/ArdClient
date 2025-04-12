@@ -228,17 +228,19 @@ public class Composited implements Rendered, MapView.Clickable, EquipTarget {
             m.setup(r);
             for (Layer lay : this.lay) {
                 for (GLState gs : lay.mat.states) {
-                    if (gs instanceof TexGL.TexDraw) {
-                        String s = gs.toString().substring("TexDraw(TexR(".length(), gs.toString().lastIndexOf(','));
-                        if (resources.painedcloth.get(s) == null) {
-                            resources.painedcloth.put(s, false);
-                            Utils.saveCustomList(resources.painedcloth, "PaintedClothList");
-                        }
+                    try {
+                        if (gs instanceof TexGL.TexDraw) {
+                            String s = gs.toString().substring("TexDraw(TexR(".length(), gs.toString().lastIndexOf(','));
+                            if (resources.painedcloth.get(s) == null) {
+                                resources.painedcloth.put(s, false);
+                                Utils.saveCustomList(resources.painedcloth, "PaintedClothList");
+                            }
 
-                        if (resources.paintcloth) {
-                            resources.paintcloth(s, r);
+                            if (resources.paintcloth) {
+                                resources.paintcloth(s, r);
+                            }
                         }
-                    }
+                    } catch (Throwable e) {}
                 }
                 r.add(lay, null);
             }

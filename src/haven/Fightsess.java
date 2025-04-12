@@ -149,7 +149,7 @@ public class Fightsess extends Widget {
                     if (!((righthand != null && righthand.name.get().contains("shield")) || (lefthand != null && lefthand.name.get().contains("shield")))) {
                         PBotUtils.sysMsg(ui, "Shield not equipped!", Color.white);
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                 }
             }
 
@@ -736,7 +736,7 @@ public class Fightsess extends Widget {
                 else if (!ui.gui.chat.hasfocus && Config.forcefightfocus)
                     parent.setfocus(this);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
         }
         super.draw(g);
     }

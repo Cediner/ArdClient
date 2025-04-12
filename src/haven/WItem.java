@@ -422,7 +422,7 @@ public class WItem extends Widget implements DTarget2 {
                             break;
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                 }
             }
             if (locked) {
@@ -499,7 +499,7 @@ public class WItem extends Widget implements DTarget2 {
                 try {
                     WebBrowser.self.show(new URL(String.format("http://ringofbrodgar.com/wiki/%s", name)));
                 } catch (MalformedURLException e) {
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     getparent(GameUI.class).error("Could not launch web browser.");
                 }
             }

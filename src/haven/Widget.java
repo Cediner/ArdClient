@@ -566,7 +566,7 @@ public class Widget {
             if (in == this)
                 return (new Coord(0, 0));
             return (parent.xlate(parent.parentpos(in).add(c), true));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return new Coord(0, 0);
         }
     }
@@ -793,7 +793,7 @@ public class Widget {
                 CheckListboxItem itm = Config.disableshiftclick.get(ui.sess.glob.oc.getgob((int) args[5]).getres().basename());
                 if (itm != null && itm.selected)
                     return;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
