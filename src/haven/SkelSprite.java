@@ -32,12 +32,17 @@ import haven.Skeleton.PoseMod;
 import modification.configuration;
 import modification.dev;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.function.Supplier;
 
-public class SkelSprite extends Sprite implements Gob.Overlay.CUpd, Skeleton.HasPose, Sprite.CUpd {
+public class SkelSprite extends Sprite implements Gob.Overlay.CUpd, Skeleton.HasPose, Sprite.CUpd, EquipTarget, Sprite.Owner, Skeleton.ModOwner, RandomSource {
     public static final GLState
             rigid = new Material.Colors(java.awt.Color.GREEN),
             morphed = new Material.Colors(java.awt.Color.RED),
@@ -94,6 +99,7 @@ public class SkelSprite extends Sprite implements Gob.Overlay.CUpd, Skeleton.Has
         if (!(wrap.r instanceof FastMesh))
             return (wrap);
         FastMesh m = (FastMesh) wrap.r;
+        ArrayList<Supplier<GLState>> states = new ArrayList<>();
         for (MeshAnim.Anim anim : manims) {
             if (anim.desc().animp(m)) {
                 Rendered ret = wrap.st().apply(new MorphedMesh(m, mmorph));
@@ -237,8 +243,10 @@ public class SkelSprite extends Sprite implements Gob.Overlay.CUpd, Skeleton.Has
         update(fl);
     }
 
+    private RenderList slot;
     @Override
     public boolean setup(RenderList rl) {
+        slot = rl;
         for (Rendered p : parts)
             rl.add(p, null);
         /* rl.add(pose.debug, null); */
@@ -303,5 +311,48 @@ public class SkelSprite extends Sprite implements Gob.Overlay.CUpd, Skeleton.Has
                 bonedb = Utils.parsebool(args[1], false);
             }
         });
+    }
+
+    @Override
+    public GLState eqpoint(final String nm, final Message dat) {
+        Skeleton.BoneOffset bo = res.layer(Skeleton.BoneOffset.class, nm);
+        if(bo != null)
+            return(bo.from(pose));
+        if(pose != null)
+            return(pose.eqpoint(nm, dat));
+        return(null);
+    }
+
+    @Override
+    public double getv() {
+        Skeleton.ModOwner parent = owner.fcontext(Skeleton.ModOwner.class, false);
+        return((parent == null) ? 0 : parent.getv());
+    }
+
+    @Override
+    public Collection<Location.Chain> getloc() {
+        Collection<Location.Chain> ret = new ArrayList<>(/*slots.size()*/);
+        //for(RenderTree.Slot slot : slots)
+        //    ret.add(slot.state().get(PView.loc));
+        if (slot != null)
+            ret.add(slot.state().get(PView.loc));
+        return(ret);
+    }
+
+    @Override
+    public Random mkrandoom() {
+        return(owner.mkrandoom());
+    }
+
+    @Override
+    public Resource getres() {
+        return(res);
+    }
+
+    private static final OwnerContext.ClassResolver<SkelSprite> ctxr = new OwnerContext.ClassResolver<SkelSprite>()
+            .add(SkelSprite.class, spr -> spr);
+    @Override
+    public <T> T context(final Class<T> cl) {
+        return(OwnerContext.orparent(cl, ctxr.context(cl, this, false), owner));
     }
 }
