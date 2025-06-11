@@ -64,10 +64,11 @@ public class FoodInfo extends ItemInfo.Tip {
     private final CharacterInfo.Constipation constipation;
     private final static DecimalFormat basefepfmt = new DecimalFormat("0.##");
 
-    public FoodInfo(Owner owner, double end, double glut, double cons, Event[] evs, Effect[] efs, int[] types) {
+    public FoodInfo(Owner owner, double end, double glut, double cons, double sev, Event[] evs, Effect[] efs, int[] types) {
         super(owner);
         this.end = end;
         this.glut = glut;
+        //this.sev = sev;
         this.cons = cons;
         this.evs = evs;
         this.efs = efs;
@@ -82,6 +83,10 @@ public class FoodInfo extends ItemInfo.Tip {
         } catch (NullPointerException | OwnerContext.NoContext ignore) {
         }
         this.constipation = constipation;
+    }
+
+    public FoodInfo(Owner owner, double end, double glut, double cons, Event[] evs, Effect[] efs, int[] types) {
+        this(owner, end, glut, cons, 0, evs, efs, types);
     }
 
     public FoodInfo(Owner owner, double end, double glut, Event[] evs, Effect[] efs, int[] types) {
@@ -120,7 +125,7 @@ public class FoodInfo extends ItemInfo.Tip {
 //        Collection<BufferedImage> imgs = new LinkedList<>();
         imgs.add(RichText.render(String.format("Energy: $col[128,128,255]{%s%%}", Utils.odformat2(end * 100, 2)), 0).img);
         imgs.add(RichText.render(String.format("Hunger: $col[255,192,128]{%s\u2030}", Utils.odformat2(glut * 1000, 2)), 0).img);
-        if (cons != 0) imgs.add(RichText.render(String.format(", Satiation: $col[192,192,128]{%s%%}", Utils.odformat2(cons * 100, 2)), 0).img);
+        if (cons != 0) imgs.add(RichText.render(String.format("Satiation: $col[192,192,128]{%s%%}", Utils.odformat2(cons * 100, 2)), 0).img);
         double totalFeps = 0;
         for (int i = 0; i < evs.length; i++) {
             totalFeps += evs[i].a;
