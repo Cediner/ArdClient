@@ -2,7 +2,6 @@ package haven.sloth.gui.chr;
 
 
 import haven.Button;
-import haven.CharWnd;
 import haven.Coord;
 import haven.Coord2d;
 import haven.GOut;
@@ -10,11 +9,12 @@ import haven.Indir;
 import haven.Loading;
 import haven.Resource;
 import haven.RichText;
-import haven.sloth.io.Storage;
 import haven.Tex;
 import haven.TexI;
 import haven.Text;
 import haven.Widget;
+import haven.chrwnd.SkillWnd;
+import haven.sloth.io.Storage;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -85,13 +85,13 @@ public class CredoTree extends Widget {
 
         Coord sz();
 
-        CharWnd.Credo credo();
+        SkillWnd.Credo credo();
     }
 
     private static class Credo extends Widget implements CredoWidget {
         private Button buy;
         final CredoData data;
-        CharWnd.Credo credo;
+        SkillWnd.Credo credo;
         private Tex name;
         private Tex tt;
         private Tex lvl;
@@ -109,7 +109,7 @@ public class CredoTree extends Widget {
             }
         }
 
-        public void setSkill(final CharWnd.Credo credo) {
+        public void setSkill(final SkillWnd.Credo credo) {
             this.credo = credo;
             if (credo.on) {
                 lvl = Text.renderstroked(String.format("L %d/%d", credo.crl, credo.crlt)).tex();
@@ -132,7 +132,7 @@ public class CredoTree extends Widget {
         }
 
         @Override
-        public CharWnd.Credo credo() {
+        public SkillWnd.Credo credo() {
             return credo;
         }
 
@@ -262,7 +262,7 @@ public class CredoTree extends Widget {
         bg = new TexI(img);
     }
 
-    public void update(List<CharWnd.Credo> sks) {
+    public void update(List<SkillWnd.Credo> sks) {
         sks.forEach((skill) -> {
             if (name2credo.containsKey(skill.nm)) {
                 name2credo.get(skill.nm).setSkill(skill);

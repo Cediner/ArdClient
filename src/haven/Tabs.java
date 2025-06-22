@@ -85,7 +85,7 @@ public class Tabs {
         if (old != null)
             old.hide();
         if ((curtab = tab) != null)
-            curtab.show();
+            tab.show();
         changed(old, tab);
     }
 
@@ -115,6 +115,5 @@ public class Tabs {
         this.sz = contentsz();
     }
 
-    public void changed(Tab from, Tab to) {
-    }
+    public void changed(Tab from, Tab to) {}
 }

@@ -64,8 +64,7 @@ public class Scrollport extends Widget {
             super(sz);
         }
 
-        public void update() {
-        }
+        public void update() {}
 
         public <T extends Widget> T add(T child) {
             super.add(child);

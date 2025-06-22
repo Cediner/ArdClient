@@ -26,12 +26,14 @@
 
 package haven;
 
+import haven.chrwnd.BAttrWnd;
 import haven.purus.pbot.PBotUtils;
 import haven.purus.pbot.PBotWindowAPI;
 import haven.res.ui.tt.Wear;
 import haven.resutil.Curiosity;
 import haven.sloth.gui.MovableWidget;
 import haven.sloth.io.HiddenWndData;
+
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -46,7 +48,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 
 import static haven.DefSettings.CURIOHIGH;
 import static haven.DefSettings.CURIOLOW;
@@ -943,7 +944,7 @@ Window extends MovableWidget implements DTarget {
         } catch (Exception e) { // fail silently
         }
         if (chrwdg != null) {
-            for (CharWnd.Attr attr2 : chrwdg.base) {
+            for (BAttrWnd.Attr attr2 : chrwdg.battr.base) {
                 //  System.out.println("name : "+attr2.attr.nm);
                 if (attr2.attr.nm.contains("str")) {
                     statmap.put("str", attr2.attr.comp);

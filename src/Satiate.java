@@ -1,4 +1,3 @@
-import haven.CharWnd;
 import haven.Coord;
 import haven.Indir;
 import haven.ItemInfo;
@@ -8,6 +7,7 @@ import haven.PUtils;
 import haven.Resource;
 import haven.RichText;
 import haven.Text;
+import haven.chrwnd.Constipations;
 
 import java.awt.image.BufferedImage;
 
@@ -24,7 +24,7 @@ public class Satiate implements InfoFactory {
                 BufferedImage satImg = Text.render(satiateStr).img;
                 int satImgHeight = satImg.getHeight();
                 BufferedImage var3x = PUtils.convolvedown((((Resource) icon.get()).layer(Resource.imgc)).img,
-                        new Coord(satImgHeight, satImgHeight), CharWnd.Constipations.tflt);
+                        new Coord(satImgHeight, satImgHeight), Constipations.tflt);
                 String byStr = Resource.getLocString(Resource.BUNDLE_LABEL, "%s by $col[255,128,128]{%d%%}");
                 BufferedImage var4x = RichText.render(String.format(byStr,
                         new Object[]{(((Resource) icon.get()).layer(Resource.tooltip)).t, Integer.valueOf((int) Math.round((1.0D - val) * 100.0D))}), 0, new Object[0]).img;

@@ -39,6 +39,12 @@ public class CompImage {
         public void draw(Graphics g, Coord c);
 
         public Coord sz();
+
+        public static final Image nil = new Image() {
+            public void draw(Graphics g, Coord c) {}
+
+            public Coord sz() {return (Coord.z);}
+        };
     }
 
     private static class Placed {
@@ -69,9 +75,7 @@ public class CompImage {
                 g.drawImage(img, c.x, c.y, null);
             }
 
-            public Coord sz() {
-                return (PUtils.imgsz(img));
-            }
+            public Coord sz() {return (PUtils.imgsz(img));}
         });
     }
 
@@ -91,9 +95,7 @@ public class CompImage {
                 img.compose(g, c);
             }
 
-            public Coord sz() {
-                return (img.sz);
-            }
+            public Coord sz() {return (img.sz);}
         });
     }
 

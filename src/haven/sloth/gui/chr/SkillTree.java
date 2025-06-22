@@ -1,7 +1,6 @@
 package haven.sloth.gui.chr;
 
 import haven.Button;
-import haven.CharWnd;
 import haven.Coord;
 import haven.Coord2d;
 import haven.GOut;
@@ -9,11 +8,12 @@ import haven.Indir;
 import haven.Loading;
 import haven.Resource;
 import haven.RichText;
-import haven.sloth.io.Storage;
 import haven.Tex;
 import haven.TexI;
 import haven.Text;
 import haven.Widget;
+import haven.chrwnd.SkillWnd;
+import haven.sloth.io.Storage;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -95,13 +95,13 @@ public class SkillTree extends Widget {
 
         Coord sz();
 
-        CharWnd.Skill skill();
+        SkillWnd.Skill skill();
     }
 
     private static class Skill extends Widget implements SkillWidget {
         private Button buy;
         final SkillData data;
-        CharWnd.Skill skill;
+        SkillWnd.Skill skill;
         private Tex name;
         private Tex cost;
         private Tex tt;
@@ -119,7 +119,7 @@ public class SkillTree extends Widget {
             }
         }
 
-        public void setSkill(final CharWnd.Skill skill) {
+        public void setSkill(final SkillWnd.Skill skill) {
             this.skill = skill;
             cost = Text.renderstroked("" + skill.cost).tex();
             if (!skill.has)
@@ -131,7 +131,7 @@ public class SkillTree extends Widget {
         }
 
         @Override
-        public CharWnd.Skill skill() {
+        public SkillWnd.Skill skill() {
             return skill;
         }
 
@@ -226,7 +226,7 @@ public class SkillTree extends Widget {
         }
 
         @Override
-        public CharWnd.Skill skill() {
+        public SkillWnd.Skill skill() {
             return myself.skill;
         }
 
@@ -303,7 +303,7 @@ public class SkillTree extends Widget {
         bg = new TexI(img);
     }
 
-    public void update(List<CharWnd.Skill> sks) {
+    public void update(List<SkillWnd.Skill> sks) {
         sks.forEach((skill) -> {
             if (name2skill.containsKey(skill.nm)) {
                 name2skill.get(skill.nm).setSkill(skill);

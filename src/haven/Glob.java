@@ -183,6 +183,10 @@ public class Glob {
             }
             return compLine;
         }
+
+        public Indir<Resource> res() {
+            return (Resource.local().load("gfx/hud/chr/" + nm));
+        }
     }
 
     private static Color colstep(Color o, Color t, double a) {

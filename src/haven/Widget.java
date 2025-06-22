@@ -1290,6 +1290,88 @@ public class Widget {
         return (ret);
     }
 
+    public Coord addhlp(Coord c, int pad, Widget... children) {
+        int x = c.x, y = c.y;
+        int maxh = 0;
+        for (Widget child : children)
+            maxh = Math.max(maxh, child.sz.y);
+        for (Widget child : children) {
+            add(child, x, y + ((maxh - child.sz.y) / 2));
+            x += child.sz.x + pad;
+        }
+        return (Coord.of(x - pad, y + maxh));
+    }
+
+    public int addhlp(Coord c, int pad, int w, Widget... children) {
+        int cw = (w - ((children.length - 1) * pad)) / children.length;
+        for (Widget ch : children)
+            ch.resizew(cw);
+        return (addhl(c, w, children));
+    }
+
+    public int addhl(Coord c, int w, Widget... children) {
+        int x = c.x, y = c.y;
+        if (children.length == 1) {
+            adda(children[0], x + (w / 2), y, 0.5, 0.0);
+            return (y + children[0].sz.y);
+        }
+        int maxh = 0, cw = 0;
+        for (Widget child : children) {
+            cw += child.sz.x;
+            maxh = Math.max(maxh, child.sz.y);
+        }
+        int tpad = w - cw, npad = children.length - 1, perror = 0;
+        for (Widget child : children) {
+            add(child, x, y + ((maxh - child.sz.y) / 2));
+            x += child.sz.x;
+            perror += tpad;
+            x += perror / npad;
+            perror %= npad;
+        }
+        return (y + maxh);
+    }
+
+    public Coord addvlp(Coord c, int pad, Widget... children) {
+        int x = c.x, y = c.y;
+        int maxw = 0;
+        for (Widget child : children)
+            maxw = Math.max(maxw, child.sz.x);
+        for (Widget child : children) {
+            add(child, x + ((maxw - child.sz.x) / 2), y);
+            y += child.sz.y + pad;
+        }
+        return (Coord.of(x + maxw, y - pad));
+    }
+
+    public int addvlp(Coord c, int pad, int h, Widget... children) {
+        int ch = (h - ((children.length - 1) * pad)) / children.length;
+        for (Widget wdg : children)
+            wdg.resizeh(ch);
+        return (addvl(c, h, children));
+    }
+
+    public int addvl(Coord c, int h, Widget... children) {
+        int x = c.x, y = c.y;
+        if (children.length == 1) {
+            adda(children[0], x, y + (h / 2), 0.0, 0.5);
+            return (x + children[0].sz.x);
+        }
+        int maxw = 0, ch = 0;
+        for (Widget child : children) {
+            ch += child.sz.y;
+            maxw = Math.max(maxw, child.sz.x);
+        }
+        int tpad = h - ch, npad = children.length - 1, perror = 0;
+        for (Widget child : children) {
+            add(child, x + ((maxw - child.sz.x) / 2), y);
+            y += child.sz.y;
+            perror += tpad;
+            y += perror / npad;
+            perror %= npad;
+        }
+        return (x + maxw);
+    }
+
     public void raise() {
         synchronized ((ui != null) ? ui : new Object()) {
             unlink();

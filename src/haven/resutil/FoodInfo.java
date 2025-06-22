@@ -26,9 +26,6 @@
 
 package haven.resutil;
 
-import haven.CharWnd;
-import static haven.CharWnd.Constipations.color;
-import static haven.CharWnd.Constipations.tflt;
 import haven.CharacterInfo;
 import haven.CompImage;
 import haven.Coord;
@@ -36,10 +33,8 @@ import haven.GItem;
 import haven.ItemData;
 import haven.ItemInfo;
 import haven.OwnerContext;
-import static haven.PUtils.convolvedown;
 import haven.Pair;
 import haven.QualityList;
-import static haven.QualityList.SingleType.Quality;
 import haven.Resource;
 import haven.RichText;
 import haven.Session;
@@ -47,13 +42,20 @@ import haven.TexI;
 import haven.Text;
 import haven.UI;
 import haven.Utils;
+import haven.chrwnd.FoodMeter;
 import haven.res.ui.tt.q.qbuff.QBuff;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import static haven.PUtils.convolvedown;
+import static haven.QualityList.SingleType.Quality;
+import static haven.chrwnd.Constipations.color;
+import static haven.chrwnd.Constipations.tflt;
 
 public class FoodInfo extends ItemInfo.Tip {
     public final double end, glut, cons;
@@ -95,13 +97,13 @@ public class FoodInfo extends ItemInfo.Tip {
 
 
     public static class Event {
-        public final CharWnd.FoodMeter.Event ev;
+        public final FoodMeter.Event ev;
         public final BufferedImage img;
         public final double a;
         private final String res;
 
         public Event(Resource res, double a) {
-            this.ev = res.layer(CharWnd.FoodMeter.Event.class);
+            this.ev = res.layer(FoodMeter.Event.class);
             this.img = res.layer(Resource.imgc).img;
             this.a = a;
             this.res = res.name;

@@ -1424,16 +1424,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
             hand.add(new DraggedItem(g, lc));
             updhand();
         } else if (place == "chr") {
-            studywnd = add(new StudyWnd(), UI.scale(400, 100));
-            if (!Config.autowindows.get("Study").selected)
-                studywnd.hide();
             chrwdg = add((CharWnd) child, UI.scale(300, 50));
             if (!Config.autowindows.get("Character Sheet").selected)
                 chrwdg.hide();
-            addcmeter(hungermeter = new HungerMeter(chrwdg.glut, "HungerMeter"));
-            hungermeter.show(Config.hungermeter);
-            addcmeter(fepmeter = new FepMeter(chrwdg.feps, "FepMeter"));
-            fepmeter.show(Config.fepmeter);
         } else if (place == "craft") {
             final Widget mkwdg = child;
             if (craftwnd != null) {

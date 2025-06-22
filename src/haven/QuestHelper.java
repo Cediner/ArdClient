@@ -1,5 +1,6 @@
 package haven;
 
+import haven.chrwnd.QuestWnd;
 import haven.sloth.gui.ResizableWnd;
 
 import java.awt.Color;
@@ -60,7 +61,7 @@ public class QuestHelper extends ResizableWnd {
         disable();
     }
 
-    public void addConds(List<CharWnd.Quest.Condition> ncond, int id) {
+    public void addConds(List<QuestWnd.Quest.Condition> ncond, int id) {
         if (active) {
             boolean alltrue = true;
 
@@ -134,11 +135,16 @@ public class QuestHelper extends ResizableWnd {
                         temp.clear();
 
                         try {
-                            ui.gui.chrwdg.cqst.quests.forEach(quest -> {
-                                if (quest.id != ui.gui.chrwdg.credos.pqid) {
-                                    ui.gui.chrwdg.wdgmsg("qsel", quest.id);
-                                }
-                            });
+                            haven.chrwnd.QuestWnd qwnd = ui.gui.chrwdg.quest;
+                            haven.chrwnd.SkillWnd swnd = ui.gui.chrwdg.skill;
+                            if (qwnd != null && swnd != null)
+                                qwnd.cqst.quests.forEach(quest -> {
+                                    if (quest.id != ui.gui.chrwdg.skill.credos.pqid) {
+                                        ui.gui.chrwdg.wdgmsg("qsel", quest.id);
+                                    }
+                                });
+                            else
+                                refresh = true;
                         } catch (NullPointerException var9) {
                             var9.printStackTrace();
                         } catch (Loading var10) {

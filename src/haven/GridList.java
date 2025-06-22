@@ -102,8 +102,7 @@ public abstract class GridList<T> extends Widget {
         update();
     }
 
-    protected void drawbg(GOut g) {
-    }
+    protected void drawbg(GOut g) {}
 
     protected void drawsel(GOut g) {
         g.chcolor(255, 255, 0, 128);

@@ -26,11 +26,12 @@
 
 package haven;
 
+import haven.chrwnd.BAttrWnd;
+import haven.chrwnd.SAttrWnd;
 import haven.res.ui.tt.Armor;
 import haven.res.ui.tt.wpn.Damage;
 import modification.configuration;
 
-import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -424,11 +425,11 @@ public class Equipory extends Widget implements DTarget {
             CharWnd chrwdg = null;
             try {
                 chrwdg = ui.gui.chrwdg;
-                for (CharWnd.Attr attr : chrwdg.base) {
+                for (BAttrWnd.Attr attr : chrwdg.battr.base) {
                     if (attr.attr.nm.contains("prc"))
                         h = attr.attr.comp;
                 }
-                for (CharWnd.SAttr attr : chrwdg.skill)
+                for (SAttrWnd.SAttr attr : chrwdg.sattr.skill)
                     if (attr.attr.nm.contains("exp"))
                         s = attr.attr.comp;
                 x = h * s;
@@ -443,11 +444,11 @@ public class Equipory extends Widget implements DTarget {
             CharWnd chrwdg = null;
             try {
                 chrwdg = ui.gui.chrwdg;
-                for (CharWnd.Attr attr : chrwdg.base) {
+                for (BAttrWnd.Attr attr : chrwdg.battr.base) {
                     if (attr.attr.nm.contains("int"))
                         h = attr.attr.comp;
                 }
-                for (CharWnd.SAttr attr : chrwdg.skill)
+                for (SAttrWnd.SAttr attr : chrwdg.sattr.skill)
                     if (attr.attr.nm.contains("ste"))
                         s = attr.attr.comp;
                 x = h * s;

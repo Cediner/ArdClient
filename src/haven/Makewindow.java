@@ -26,6 +26,9 @@
 
 package haven;
 
+import haven.chrwnd.BAttrWnd;
+import haven.chrwnd.SAttrWnd;
+
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -373,7 +376,7 @@ public class Makewindow extends Widget {
 
                             public void choice(MenuGrid.PagButton btn) {
                                 if (btn != null)
-                                    btn.pag.scm.use(btn,false);
+                                    btn.pag.scm.use(btn, false);
                                 destroy();
                             }
                         }.addat(this, cc.add(UI.scale(5, 5))).tick(dt);
@@ -415,7 +418,7 @@ public class Makewindow extends Widget {
 
                         if (Config.showcraftcap && chrwdg != null) {
                             String name = qm.get().basename();
-                            for (CharWnd.SAttr attr : chrwdg.skill) {
+                            for (SAttrWnd.SAttr attr : chrwdg.sattr.skill) {
                                 if (name.equals(attr.attr.nm)) {
                                     g.aimage(attr.attr.comptex, new Coord(x, qmy + (qmodsz.y / 2)), 0, 0.5);
                                     x += attr.attr.comptex.sz().x;
@@ -423,7 +426,7 @@ public class Makewindow extends Widget {
                                     break;
                                 }
                             }
-                            for (CharWnd.Attr attr : chrwdg.base) {
+                            for (BAttrWnd.Attr attr : chrwdg.battr.base) {
                                 if (name.equals(attr.attr.nm)) {
                                     g.aimage(attr.attr.comptex, new Coord(x, qmy + (qmodsz.y / 2)), 0, 0.5);
                                     x += attr.attr.comptex.sz().x;
@@ -498,13 +501,13 @@ public class Makewindow extends Widget {
                         return (qm.get().flayer(Resource.tooltip).t);
                     if (Config.showcraftcap && chrwdg != null) {
                         String value = qm.get().basename();
-                        for (CharWnd.SAttr attr : chrwdg.skill) {
+                        for (SAttrWnd.SAttr attr : chrwdg.sattr.skill) {
                             if (value.equals(attr.attr.nm)) {
                                 tvalue = attr.attr.comptex;
                                 break;
                             }
                         }
-                        for (CharWnd.Attr attr : chrwdg.base) {
+                        for (BAttrWnd.Attr attr : chrwdg.battr.base) {
                             if (value.equals(attr.attr.nm)) {
                                 tvalue = attr.attr.comptex;
                                 break;

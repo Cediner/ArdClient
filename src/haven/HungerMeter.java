@@ -1,13 +1,14 @@
 package haven;
 
+import haven.chrwnd.GlutMeter;
 import modification.configuration;
 
 import java.awt.Color;
 
 public class HungerMeter extends IMeter {
-    private final CharWnd.GlutMeter glut;
+    private final GlutMeter glut;
 
-    public HungerMeter(CharWnd.GlutMeter glut, final String name) {
+    public HungerMeter(GlutMeter glut, final String name) {
         super(Resource.local().load("hud/meter/hungermeter"), name);
         this.glut = glut;
     }

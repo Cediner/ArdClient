@@ -32,6 +32,7 @@ public class Scrollbar extends Widget {
     private static final Tex schainm = Theme.tex("scroll/vertical", 1);
     private static final Tex schaint = Theme.tex("scroll/vertical", 2);
     public static final Tex sflarp = Theme.tex("scroll/vertical", 3);
+    public static final int width = sflarp.sz().x;
     public Scrollable ctl;
     public int val, min, max;
     private UI.Grab drag = null;

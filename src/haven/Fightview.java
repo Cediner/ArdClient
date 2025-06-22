@@ -27,6 +27,7 @@
 package haven;
 
 
+import haven.chrwnd.SAttrWnd;
 import haven.res.ui.obj.buddy.Buddy;
 import haven.sloth.gfx.GobCombatSprite;
 import haven.sloth.gob.AggroMark;
@@ -409,7 +410,7 @@ public class Fightview extends MovableWidget {
         } catch (Throwable e) { // fail silently
         }
         if (chrwdg != null) {
-            for (CharWnd.SAttr attr : chrwdg.skill) {
+            for (SAttrWnd.SAttr attr : chrwdg.sattr.skill) {
                 if (attr.attr.nm.contains("unarmed")) {
                     unarmedcombat = attr.attr.comp;
                 }

@@ -19,11 +19,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 public class FoodService {
-    private static final String DEFAULT_SERVICE_URL = "https://food.cediner.tech/";
+    private static final String DEFAULT_SERVICE_URL = "https://food.hafen.tech/";
     public static final String API_ENDPOINT = Utils.getpref("food_service_endpoint_api", DEFAULT_SERVICE_URL + "api/");
     private static final String FOOD_DATA_URL = Utils.getpref("food_service_data_url", DEFAULT_SERVICE_URL + "api/data/food-info.json");
     private static final File FOOD_DATA_CACHE_FILE = new File("food_data.json");
@@ -78,6 +76,7 @@ public class FoodService {
     }
 
     private static double lastModified = -1;
+
     /**
      * Check last modified for the food_data file and request update from server if too old
      */

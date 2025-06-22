@@ -1,13 +1,14 @@
 package haven;
 
+import haven.chrwnd.FoodMeter;
 import modification.configuration;
 
 import java.awt.Color;
 
 public class FepMeter extends IMeter {
-    private final CharWnd.FoodMeter food;
+    private final FoodMeter food;
 
-    public FepMeter(CharWnd.FoodMeter food, String name) {
+    public FepMeter(FoodMeter food, String name) {
         super(Resource.local().load("hud/meter/fepmeter"), name);
         this.food = food;
     }
@@ -17,7 +18,7 @@ public class FepMeter extends IMeter {
         boolean mini = configuration.minimalisticmeter;
         double x = 0;
         int w = !mini ? IMeter.msz.x : sz.x;
-        for (CharWnd.FoodMeter.El el : food.els) {
+        for (FoodMeter.El el : food.els) {
             int l = (int) Math.floor((x / food.cap) * w);
             int r = (int) Math.floor(((x += el.a) / food.cap) * w);
             try {
