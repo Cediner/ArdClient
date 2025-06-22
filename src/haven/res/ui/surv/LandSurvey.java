@@ -1,5 +1,6 @@
 package haven.res.ui.surv;
 
+import haven.Area;
 import haven.BGL;
 import haven.Button;
 import haven.Coord;
@@ -36,16 +37,15 @@ import static javax.media.opengl.fixedfunc.GLPointerFunc.GL_COLOR_ARRAY;
 import static javax.media.opengl.fixedfunc.GLPointerFunc.GL_VERTEX_ARRAY;
 import modification.dev;
 import java.awt.Color;
+import java.awt.event.MouseEvent;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.stream.IntStream;
 
 public class LandSurvey extends Window {
-    static {
-        dev.checkFileVersion("ui/surv", 42);
-    }
-
-    final Coord ul;
-    final Coord br;
+    public final Area area;
+    public final Data data;
+    private boolean inited = false;
     MapView mv;
     Display dsp;
     final FastMesh ol;
@@ -55,8 +55,6 @@ public class LandSurvey extends Window {
     final Label wlbl;
     final Label dlbl;
     final HSlider zset;
-    final float gran;
-    int tz;
     int defz;
 
     public IButton plus;
@@ -64,32 +62,32 @@ public class LandSurvey extends Window {
     public Label zvalue;
     public Label value;
 
-    public LandSurvey(Coord ul, Coord br, float gran, int tz) {
+    public LandSurvey(Area area, Data data) {
         super(Coord.z, "Land survey", "Land survey", true);
-        this.ul = ul;
-        this.br = br;
-        this.gran = gran;
-        this.tz = tz;
-        this.dloc = Location.xlate(new Coord3f(this.ul.x * (float) tilesz.x, -this.ul.y * (float) tilesz.y, 0));
+        this.area = area;
+        this.data = data;
+        this.dloc = Location.xlate(new Coord3f(area.ul.x * (float) tilesz.x, -area.ul.y * (float) tilesz.y, 0));
         VertexArray olv = new VertexArray(FloatBuffer.wrap(new float[]{
                 0, 0, 0,
-                (br.x - ul.x) * (float) tilesz.x, 0, 0,
-                (br.x - ul.x) * (float) tilesz.x, -(br.y - ul.y) * (float)
-                MCache.tilesz.y, 0, 0, -(br.y - ul.y) * (float) tilesz.y, 0,
+                (area.br.x - area.ul.x) * (float) tilesz.x, 0, 0,
+                (area.br.x - area.ul.x) * (float) tilesz.x, -(area.br.y - area.ul.y) * (float)
+                MCache.tilesz.y, 0, 0, -(area.br.y - area.ul.y) * (float) tilesz.y, 0,
         }));
         ol = new FastMesh(new VertexBuf(olv), ShortBuffer.wrap(new short[]{
                 0, 3, 1,
                 1, 3, 2,
         }));
-        albl = add(new Label(String.format("Area: %d m\u00b2", (br.x - ul.x) * (br.y - ul.y))), 0, 0);
+        albl = add(new Label(String.format("Area: %d m\u00b2", area.area())), 0, 0);
         zdlbl = add(new Label("..."), UI.scale(0, 15));
         wlbl = add(new Label("..."), UI.scale(0, 30));
         dlbl = add(new Label("..."), UI.scale(0, 45));
-        zset = add(new HSlider(UI.scale(225), -1, 1, tz) {
+        defz = data.dz[0];
+        zset = add(new HSlider(UI.scale(225), -1, 1, data.dz[0]) {
             public void changed() {
-                LandSurvey.this.tz = val; changeVal(String.format("%s%d", (val > defz) ? "+" : "", val - defz));
+                IntStream.range(0, data.dz.length).forEach(i -> data.dz[i] = val);
+                changeVal(String.format("%s%d", (val > defz) ? "+" : "", val - defz));
                 upd = true;
-                sendtz = Utils.rtime() + 0.5;
+                send();
             }
 
             public Object tooltip(Coord c, Widget prev) {
@@ -99,16 +97,22 @@ public class LandSurvey extends Window {
         zvalue = add(new Label("Z"), UI.scale(0, 70));
         value = add(new Label("...") {
             public boolean mousewheel(Coord c, int amount) {
-                final int v; if (ui.modshift) v = amount * 10;
-                else if (ui.modctrl) v = amount * 5;
-                else v = amount; wheel(-v); return (true);
+                final int v;
+                if (ui.modshift)
+                    v = amount * 10;
+                else if (ui.modctrl)
+                    v = amount * 5;
+                else
+                    v = amount;
+                wheel(-v);
+                return (true);
             }
         }, UI.scale(0, 70));
         plus = add(new IButton(Theme.fullres("buttons/circular/small/add"), this::plus), UI.scale(0, 70));
         minus = add(new IButton(Theme.fullres("buttons/circular/small/sub"), this::minus), UI.scale(0, 70));
         add(new Button(UI.scale(100), "Make level") {
             public void click() {
-                LandSurvey.this.wdgmsg("lvl", LandSurvey.this.tz / (gran * 11));
+                LandSurvey.this.wdgmsg("lvl");
             }
         }, UI.scale(0, 90));
         add(new Button(UI.scale(100), "Remove") {
@@ -120,7 +124,7 @@ public class LandSurvey extends Window {
     }
 
     public void changeVal(String text) {
-        zvalue.settext("z: " + tz);
+        zvalue.settext("z: " + data.dz[0]);
         value.settext(text);
         value.move(UI.scale(new Coord(asz.x / 2, value.c.y)), 0.5, 0);
         plus.move(UI.scale(new Coord(value.c.x + value.sz.x + 5, value.c.y)));
@@ -143,19 +147,24 @@ public class LandSurvey extends Window {
     }
 
     public static Widget mkwidget(UI ui, Object... args) {
-        Coord ul = (Coord) args[0];
-        Coord br = (Coord) args[1];
-        float gran = ((Number) args[3]).floatValue() / 11;
-        int tz = (args[2] == null) ? Integer.MIN_VALUE : Math.round(((Number) args[2]).floatValue() * gran * 11);
-        return (new LandSurvey(ul, br, gran, tz));
+        Area area = Area.corn((Coord)args[0], (Coord)args[1]);
+        float gran = ((Number)args[2]).floatValue() / 11;
+        Data data = new Data(Area.corni(area.ul, area.br), gran);
+        LandSurvey srv = new LandSurvey(area, data);
+        if(args[3] != null) {
+            data.decode(Utils.iv(args[3]), (byte[])args[4]);
+            srv.inited = true;
+        }
+        return(srv);
     }
 
     protected void attached() {
         super.attached();
         this.mv = getparent(GameUI.class).map;
-        this.defz = autoz();
-        changeVal(zset.val - defz + "");
         this.dsp = new Display();
+        //s_dsp = mv.drawadd(dsp);
+        //select(area);
+        //mode(new Idle());
     }
 
     class Display implements Rendered {
@@ -167,7 +176,7 @@ public class LandSurvey extends Window {
 
         Display() {
             map = mv.ui.sess.glob.map;
-            area = (br.x - ul.x + 1) * (br.y - ul.y + 1);
+            area = (LandSurvey.this.area.br.x - LandSurvey.this.area.ul.x + 1) * (LandSurvey.this.area.br.y - LandSurvey.this.area.ul.y + 1);
             cposb = Utils.mkfbuf(area * 3);
             ccolb = Utils.mkfbuf(area * 4);
             update();
@@ -192,11 +201,11 @@ public class LandSurvey extends Window {
             cposb.rewind();
             ccolb.rewind();
             Coord c = new Coord();
-            float tz = LandSurvey.this.tz / gran;
-            for (c.y = ul.y; c.y <= br.y; c.y++) {
-                for (c.x = ul.x; c.x <= br.x; c.x++) {
+            float tz = LandSurvey.this.data.dz[0] / data.gran;
+            for (c.y = LandSurvey.this.area.ul.y; c.y <= LandSurvey.this.area.br.y; c.y++) {
+                for (c.x = LandSurvey.this.area.ul.x; c.x <= LandSurvey.this.area.br.x; c.x++) {
                     float z = (float) map.getfz(c);
-                    cposb.put((c.x - ul.x) * (float) tilesz.x).put(-(c.y - ul.y) * (float) tilesz.y).put(tz);
+                    cposb.put((c.x - LandSurvey.this.area.ul.x) * (float) tilesz.x).put(-(c.y - LandSurvey.this.area.ul.y) * (float) tilesz.y).put(tz);
                     if (Math.abs(tz - z) < E) {
                         ccolb.put(0).put(1).put(0).put(1);
                     } else if (tz < z) {
@@ -219,59 +228,72 @@ public class LandSurvey extends Window {
         }
     }
 
-    private int autoz() {
+    private void initsurf() {
+        MCache map = mv.ui.sess.glob.map;
+        for (Coord vc : data.varea)
+            data.wz[data.varea.ridx(vc)] = data.dz[data.varea.ridx(vc)] = (int) Math.round(map.getfz(vc) * data.gran);
+        data.seq++;
+        upd = true;
+    }
+
+    private void initplane() {
         MCache map = mv.ui.sess.glob.map;
         double zs = 0;
         int nv = 0;
-        Coord c = new Coord();
-        for (c.y = ul.y; c.y <= br.y; c.y++) {
-            for (c.x = ul.x; c.x <= br.x; c.x++) {
-                zs += map.getfz(c);
-                nv++;
-            }
+        for (Coord vc : data.varea) {
+            zs += map.getfz(vc);
+            nv++;
         }
-        return ((int) Math.round(zs / nv));
+        int z = Math.round((float) (zs / nv) * data.gran);
+        for (int i = 0; i < data.wz.length; i++)
+            data.wz[i] = data.dz[i] = z;
+        data.seq++;
+        upd = true;
     }
-
-    private boolean upd = true;
 
     private void updmap() {
         MCache map = mv.ui.sess.glob.map;
-        Coord c = new Coord();
         int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-        int sd = 0, hn = 0; for (c.y = ul.y; c.y <= br.y; c.y++) {
-            for (c.x = ul.x; c.x <= br.x; c.x++) {
-                int z = (int) Math.round(map.getfz(c) * gran);
-                min = Math.min(min, z);
-                max = Math.max(max, z);
-                sd += tz - z;
-                if (z > tz) hn += z - tz;
-            }
-        } zset.min = min - Math.round(11 * gran);
-        zset.max = max + Math.round(11 * gran);
+        int sd = 0, hn = 0;
+        for (Coord vc : data.varea) {
+            int vz = Math.round((float) map.getfz(vc) * data.gran);
+            int tz = data.dz[data.varea.ridx(vc)];
+            min = Math.min(min, vz); max = Math.max(max, vz);
+            sd += tz - vz;
+            if (vz > tz)
+                hn += vz - tz;
+        }
         zdlbl.settext(String.format("Peak to trough: %.1f m", (max - min) / 10.0));
-        if (sd >= 0) wlbl.settext(String.format("Units of soil required: %d", sd));
-        else wlbl.settext(String.format("Units of soil left over: %d", -sd));
-        dlbl.settext(String.format("Units of soil to dig: %d", hn)); dsp.update();
+        if (sd >= 0)
+            wlbl.settext(String.format("Units of soil required: %d", sd));
+        else
+            wlbl.settext(String.format("Units of soil left over: %d", -sd));
+        dlbl.settext(String.format("Units of soil to dig: %d", hn));
     }
 
-    private double sendtz = 0;
+    private void send() {
+        wdgmsg("data", data.encode());
+    }
+
+    private boolean upd = true;
+    private int mapseq = -1;
     private static final GLState olmat = GLState.compose(new ColState(new Color(255, 0, 0, 64)), Rendered.eyesort, new DepthOffset(-2, -2));
     private int olseq = -1;
 
     public void tick(double dt) {
-        if (tz == Integer.MIN_VALUE) {
+        if (!inited) {
             try {
-                zset.val = defz = tz = autoz();
-                changeVal(0 + "");
+                initplane();
+                send();
                 olseq = mv.ui.sess.glob.map.olseq;
-                upd = true;
-            } catch (Loading l) {
-            }
-        } else {
-            if (upd || (olseq != mv.ui.sess.glob.map.olseq)) {
+                inited = true;
+            } catch (Loading l) {}
+        }
+        if (inited) {
+            if (upd || (mapseq != mv.ui.sess.glob.map.chseq) || (olseq != mv.ui.sess.glob.map.olseq)) {
                 try {
                     updmap();
+                    mapseq = mv.ui.sess.glob.map.chseq;
                     olseq = mv.ui.sess.glob.map.olseq;
                     upd = false;
                 } catch (Loading l) {
@@ -280,21 +302,25 @@ public class LandSurvey extends Window {
 
             if (olseq != -1) {
                 mv.drawadd(dsp);
-                mv.drawadd(GLState.compose(olmat, Location.xlate(new Coord3f(ul.x * (float) tilesz.x, -ul.y * (float) tilesz.y, tz))).apply(ol));
+                mv.drawadd(GLState.compose(olmat, Location.xlate(new Coord3f(area.ul.x * (float) tilesz.x, -area.ul.y * (float) tilesz.y, data.dz[0]))).apply(ol));
             }
-        }
-        if ((sendtz != 0) && (Utils.rtime() > sendtz)) {
-            wdgmsg("tz", tz / (gran * 11));
-            sendtz = 0;
         }
         super.tick(dt);
     }
 
     public void uimsg(String name, Object... args) {
         if (name == "tz") {
-            tz = Math.round(((Number) args[0]).floatValue() * gran); zset.val = tz; upd = true;
+            data.decode(Utils.iv(args[0]), (byte[]) args[1]);
+            upd = true;
         } else {
             super.uimsg(name, args);
         }
+    }
+
+    public void destroy() {
+        //mode(null);
+        //if (s_dsp != null)
+        //    s_dsp.remove();
+        super.destroy();
     }
 }
