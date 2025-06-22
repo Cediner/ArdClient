@@ -466,7 +466,7 @@ public class SkillWnd extends Widget {
         Widget prev;
 
         prev = add(CharWnd.settip(new Img(catf.render(Resource.getLocString(Resource.BUNDLE_LABEL, "Lore & Skills")).tex()), "gfx/hud/chr/tips/skills"), Coord.z);
-        LoadingTextBox info = add(new LoadingTextBox(new Coord(attrw, height), "", ifnd), prev.pos("bl").adds(5, 0).add(wbox.btloff()));
+        CharWnd.LoadingTextBox info = add(new CharWnd.LoadingTextBox(new Coord(attrw, height), "", ifnd), prev.pos("bl").adds(5, 0).add(wbox.btloff()));
         info.bg = new Color(0, 0, 0, 128);
         Frame.around(this, Collections.singletonList(info));
 
