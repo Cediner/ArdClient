@@ -484,6 +484,15 @@ public class Pathfinder extends Thread {
                         synchronized (gui.map) {
                             gui.map.foundPath = false;
                         }
+                        if (DEBUG) {
+                            g.setColor(Color.WHITE);
+                            g.fillRect(destTile.x * 11+3, destTile.y * 11+3, 11-6, 11-6);
+                            try {
+                                ImageIO.write(bMap, "png", new File(System.currentTimeMillis() + "fail.png"));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         return;
                     }
 
