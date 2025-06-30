@@ -2,6 +2,7 @@ package haven.automation;
 
 import haven.Area;
 import haven.Button;
+import haven.CheckBox;
 import haven.CheckListbox;
 import haven.CheckListboxItem;
 import haven.Config;
@@ -50,10 +51,13 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -111,12 +115,13 @@ public class AreaPicker extends Window implements Runnable {
 
 
     public Button refresh, selectgobbtn, selectedgobbtn, selectedflowerbtn, selectstoragebtn, selectedstoragebtn, selecteditembtn, selecteditemaddbtn, runbtn, stopbtn, pausumebtn, loadbtn, savebtn, exportbtn, importbtn;
-    public Label l1, l2, l3, l4, l5;
+    public Label l1, l2, l3, l4, l5, l6;
     public Label maininfolbl, areagobinfolbl, flowerpetalsinfolbl, areastorageinfolbl, iteminfolbl;
     public Dropbox<String> collecttriggerdbx;
     public Window selectedgobwnd, selectedflowerwnd, selectedstoragewnd, selecteditemwnd;
     public CheckListbox selectedgoblbox, selectedflowerlbox, selectedstoragelbox, selecteditemlbox;
     public TextEntry waitingtimete, selectedgobsearch, selectedflowersearch, selectedstoragesearch, selecteditemsearch, selecteditemaddtext;
+    public CheckBox scancontinuouslycheckbox;
 
     public int retry = 5;
     public int waitingtime = 1000;
@@ -788,6 +793,15 @@ public class AreaPicker extends Window implements Runnable {
         });
         importbtn.settip("Import task from clipboard");
 
+        scancontinuouslycheckbox = new CheckBox("") {
+            @Override
+            public void set(boolean a) {
+                if (!isblocked()) {
+                    super.set(a);
+                }
+            }
+        };
+
         appender.setHorizontalMargin(5);
         appender.setVerticalMargin(2);
         appender.addRow(maininfolbl);
@@ -796,6 +810,7 @@ public class AreaPicker extends Window implements Runnable {
         appender.addRow(l3 = new Label("3. Storage type"), collecttriggerdbx);
         appender.addRow(l4 = new Label("4. Objects to storage"), selectstoragebtn, selectedstoragebtn, areastorageinfolbl);
         appender.addRow(l5 = new Label("5. Items for storage"), selecteditembtn, iteminfolbl);
+        appender.addRow(l6 = new Label("6. Scan continuously for 10 minutes if no objects to collect?"), scancontinuouslycheckbox);
 
         appender.addRow(runbtn, loadbtn, savebtn, exportbtn, importbtn);
         add(stopbtn, runbtn.c);
@@ -831,6 +846,10 @@ public class AreaPicker extends Window implements Runnable {
                     if (!items.isEmpty()) task.put("Items", items);
                 }
             }
+        }
+
+        if (scancontinuouslycheckbox.a) {
+            task.put("ScanContinuously", scancontinuouslycheckbox.a);
         }
 
         return (task);
@@ -981,6 +1000,10 @@ public class AreaPicker extends Window implements Runnable {
             }
         }
 
+        if (object.has("ScanContinuously")) {
+            scancontinuouslycheckbox.set(Boolean.parseBoolean(object.get("ScanContinuously").toString()));
+        }
+
         return (dirty);
     }
 
@@ -1025,13 +1048,19 @@ public class AreaPicker extends Window implements Runnable {
             final List<PBotGob> storages = new ArrayList<>(currentstoragelist);
             final List<PBotGob> objects = new ArrayList<>(currentgoblist);
             byte cr = checkcollectstate();
-            for (int p = 1; !objects.isEmpty(); p++) {
+            int continuousScanEmptyTries = 0;
+            for (int p = 1; !objects.isEmpty() || (scancontinuouslycheckbox.a && continuousScanEmptyTries < 600); p++) {
                 pauseCheck();
+                addForContinuousScan(storages, objects);
+
                 PBotGob pgob = closestGob(objects);
                 if (pgob == null) {
                     objects.remove(pgob);
+                    continuousScanEmptyTries++;
+                    sleep(1000);
                     continue;
                 }
+                continuousScanEmptyTries = 0;
                 for (int i = 0; ; i++) {
                     debugLog("Gob is " + p + " of " + currentgoblist.size() + ". Try is " + (i + 1), Color.YELLOW);
                     if (cr == -1 || cr == 0) {
@@ -1202,6 +1231,18 @@ public class AreaPicker extends Window implements Runnable {
             }
         }
         debugLogPing("Finish!", Color.GREEN);
+    }
+
+    private void addForContinuousScan(List<PBotGob> storages, List<PBotGob> objects) {
+        if (scancontinuouslycheckbox.a) {
+            List<PBotGob> newStorageGobs = findGobsInArea(storagearea, selectedstoragelist, currentstoragelist);
+            currentstoragelist.addAll(newStorageGobs);
+            storages.addAll(newStorageGobs);
+
+            List<PBotGob> newGobs = findGobsInArea(gobarea, selectedgoblist, currentgoblist);
+            currentgoblist.addAll(newGobs);
+            objects.addAll(newGobs);
+        }
     }
 
     public void storaging(final List<PBotGob> storages) throws InterruptedException {
@@ -1975,7 +2016,7 @@ public class AreaPicker extends Window implements Runnable {
         }
     }
 
-    public void areainfo(Label lbl, final Area area, final List<CheckListboxItem> checklist) {
+    public void areainfo(Label lbl, final Area area, final List<CheckListboxItem> checklist, int gobCount) {
         if (area != null) {
             StringBuilder sb = new StringBuilder();
             int x = Math.abs(area.br.x - area.ul.x) / 11;
@@ -1983,11 +2024,7 @@ public class AreaPicker extends Window implements Runnable {
             sb.append("Area ").append(x).append("x").append(y);
             if (!checklist.isEmpty()) {
                 sb.append(" : ");
-                int o = 0;
-                for (CheckListboxItem item : checklist)
-                    if (item.selected)
-                        o += currentList(PBotUtils.gobsInArea(ui, area.ul, area.br), item.name).size();
-                sb.append(o).append(" selected objects");
+                sb.append(gobCount).append(" selected objects");
             }
             if (lbl != null) {
                 lbl.settext(sb.toString());
@@ -1999,11 +2036,11 @@ public class AreaPicker extends Window implements Runnable {
     public void updateinfo(String type) {
         switch (type) {
             case "gob":
-                areainfo(areagobinfolbl, gobarea, selectedgoblist);
+                areainfo(areagobinfolbl, gobarea, selectedgoblist, currentgoblist.size());
 //                pack();
                 break;
             case "storage":
-                areainfo(areastorageinfolbl, storagearea, selectedstoragelist);
+                areainfo(areastorageinfolbl, storagearea, selectedstoragelist, currentstoragelist.size());
 //                pack();
                 break;
             case "flower":
@@ -2021,40 +2058,34 @@ public class AreaPicker extends Window implements Runnable {
         if (type.equals("gob")) {
             currentgoblist.clear();
             if (gobarea != null) {
-                for (CheckListboxItem item : selectedgoblist) {
-                    if (item.selected) {
-                        currentgoblist.addAll(currentList(PBotUtils.gobsInArea(ui, gobarea.ul, gobarea.br), item.name));
-//                    currentgoblist.sort((o1, o2) -> {
-//                        Coord2d pc = PBotGobAPI.player(ui).getRcCoords();
-//                        return Double.compare(o1.getRcCoords().dist(pc), o2.getRcCoords().dist(pc));
-//                    });
-                    }
-                }
+                currentgoblist.addAll(findGobsInArea(gobarea, selectedgoblist, currentgoblist));
             }
         } else if (type.equals("storage")) {
             currentstoragelist.clear();
             if (storagearea != null) {
-                for (CheckListboxItem item : selectedstoragelist) {
-                    if (item.selected) {
-                        currentstoragelist.addAll(currentList(PBotUtils.gobsInArea(ui, storagearea.ul, storagearea.br), item.name));
-//                    currentstoragelist.sort((o1, o2) -> {
-//                        Coord2d pc = PBotGobAPI.player(ui).getRcCoords();
-//                        return Double.compare(o1.getRcCoords().dist(pc), o2.getRcCoords().dist(pc));
-//                    });
-                    }
-                }
+                currentstoragelist.addAll(findGobsInArea(storagearea, selectedstoragelist, currentstoragelist));
             }
         }
     }
 
-    public List<PBotGob> currentList(final List<PBotGob> list, String item) {
-        final List<PBotGob> total = new ArrayList<>();
-        for (PBotGob pgob : list) {
-            String s = pgob.getResname();
-            if (s != null && s.equals(item))
-                total.add(pgob);
+    private List<PBotGob> findGobsInArea(Area area, List<CheckListboxItem> gobResnames, List<PBotGob> excludedGobs) {
+        if (area == null) {
+            return Collections.emptyList();
         }
-        return total;
+
+        List<PBotGob> gobs = PBotUtils.gobsInArea(ui, area.ul, area.br);
+        Set<String> selectedItemResnames = gobResnames.stream()
+                .filter(i -> i.selected && i.name != null)
+                .map(i -> i.name)
+                .collect(Collectors.toSet());
+        Set<Long> excludedGobIds = excludedGobs.stream()
+                .map(g -> g.getGobId())
+                .collect(Collectors.toSet());
+
+        return gobs.stream()
+                .filter(g -> selectedItemResnames.contains(g.getResname()))
+                .filter(g -> !excludedGobIds.contains(g.getGobId()))
+                .collect(Collectors.toList());
     }
 
     public Coord calcDropboxSize(final List<String> list) {
