@@ -37,6 +37,7 @@ import modification.configuration;
 import java.awt.Color;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import java.util.stream.DoubleStream;
 public class Inventory extends Widget implements DTarget2, ItemObserver, InventoryListener {
     public static final Coord sqsz = UI.scale(33, 33);
     public static final Tex invsq/* = Resource.loadtex("gfx/hud/invsq")*/;
+    private static final Set<String> PLAYER_INVENTORY_NAMES = new HashSet<>(Arrays.asList("Inventory", "Belt", "Equipment", "Character Sheet", "Study"));
     public boolean dropul = true;
     public Coord isz;
     public boolean[] sqmask = null;
@@ -360,6 +362,9 @@ public class Inventory extends Widget implements DTarget2, ItemObserver, Invento
             }
 
             Color colorIdentical = null;
+
+            Object[] invxf2Args = tryBuildInvxf2Args();
+
             for (WItem item : items) {
                 try {
                     if (Config.transfercolor) {
@@ -379,6 +384,11 @@ public class Inventory extends Widget implements DTarget2, ItemObserver, Invento
                         }
                     }
                     item.item.wdgmsg("transfer", Coord.z);
+                    PBotItem pbItem = new PBotItem(item);
+                    if (pbItem.isStack()) {
+                        invxf2Args[1] = pbItem.getStackContents().size();
+                        pbItem.getStackContents().get(0).gitem.wdgmsg("invxf2", invxf2Args);
+                    }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -401,6 +411,38 @@ public class Inventory extends Widget implements DTarget2, ItemObserver, Invento
         } else {
             super.wdgmsg(sender, msg, args);
         }
+    }
+
+    private Object[] tryBuildInvxf2Args() {
+        List<Integer> transferTargetIds = getTransferTargetWidgetIds();
+        if (transferTargetIds.isEmpty()) {
+            return null;
+        }
+
+        Object[] xf2args = new Object[2 + transferTargetIds.size()];
+        xf2args[0] = 0;
+        xf2args[1] = 1;
+        for (int i = 0; i < transferTargetIds.size(); i++) {
+            xf2args[i+2] = transferTargetIds.get(i);
+        }
+        return xf2args;
+    }
+
+    private List<Integer> getTransferTargetWidgetIds() {
+        List<Integer> externalInventoryIds = PBotUtils.getAllInventories(ui).stream().filter(i -> {
+                    Window window = i.inv.getparent(Window.class);
+                    if (window == null || window.cap == null || window.cap.text == null) {
+                        return false;
+                    }
+
+                    return !PLAYER_INVENTORY_NAMES.contains(window.cap.text);
+                }).map(i -> i.inv.wdgid())
+                .collect(Collectors.toList());
+
+        List<Integer> stockpiles = ui.widgets.values().stream().filter(i -> i instanceof ISBox).map(Widget::wdgid).collect(Collectors.toList());
+
+        externalInventoryIds.addAll(stockpiles);
+        return externalInventoryIds;
     }
 
     public List<WItem> getIdenticalItems(GItem item) {
